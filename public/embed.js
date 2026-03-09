@@ -1,5 +1,5 @@
 /**
- * Monty embed script
+ * Vaughan embed script
  *
  * Usage — paste before </body> on any page:
  *   <script src="https://your-domain.com/embed.js?clientId=demo" async></script>
@@ -33,8 +33,8 @@
   var rgb = hexRgb(brandColor);
 
   /* ── 2. Avoid double-init ────────────────────────────────────────────────── */
-  if (window.__montyLoaded) return;
-  window.__montyLoaded = true;
+  if (window.__vaughanLoaded) return;
+  window.__vaughanLoaded = true;
 
   /* ── 3. Detect mobile ────────────────────────────────────────────────────── */
   function isMobile() {
@@ -124,7 +124,7 @@
 
   var iframe = document.createElement('iframe');
   iframe.src = origin + '/widget?clientId=' + encodeURIComponent(clientId);
-  iframe.title = 'Monty chat';
+  iframe.title = 'Vaughan chat';
   iframe.setAttribute('allow', 'clipboard-write');
   Object.assign(iframe.style, {
     width: '100%',

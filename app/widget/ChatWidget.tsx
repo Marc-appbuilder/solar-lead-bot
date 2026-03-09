@@ -433,20 +433,21 @@ export default function ChatWidget({ clientId, config }: Props) {
       </div>
 
       {/* ── Footer ── */}
-      <p style={{
+      <div style={{
         textAlign: 'center',
-        fontSize: '10px',
-        padding: '6px 0 7px',
-        margin: 0,
+        padding: '5px 0 7px',
         flexShrink: 0,
         background: '#12151c',
-        color: 'rgba(255,255,255,0.2)',
-        letterSpacing: '0.01em',
         borderTop: '1px solid rgba(255,255,255,0.04)',
       }}>
-        Powered by{' '}
-        <span style={{ color: brand, fontWeight: 700 }}>Monty</span>
-      </p>
+        <p style={{ margin: 0, fontSize: '10px', color: 'rgba(255,255,255,0.2)', letterSpacing: '0.01em' }}>
+          Powered by{' '}
+          <span style={{ color: brand, fontWeight: 700 }}>Vaughan</span>
+        </p>
+        <p style={{ margin: 0, fontSize: '9px', color: 'rgba(255,255,255,0.12)', letterSpacing: '0.04em', marginTop: '1px' }}>
+          Your first response, every time.
+        </p>
+      </div>
     </div>
   );
 }

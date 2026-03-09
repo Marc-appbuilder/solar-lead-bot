@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Monty',
+  title: 'Vaughan',
   description: 'Embeddable AI chat widget, powered by Claude.',
 };
 
