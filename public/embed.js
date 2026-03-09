@@ -38,47 +38,82 @@
 
   /* ── 3. Detect mobile ────────────────────────────────────────────────────── */
   function isMobile() {
-    return window.innerWidth <= 640;
+    return window.innerWidth <= 768;
   }
 
   /* ── 4. Animations ───────────────────────────────────────────────────────── */
   var style = document.createElement('style');
   style.textContent =
-    '@keyframes ea-pop-in{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}' +
+    '@keyframes ea-pop-in{from{opacity:0;transform:scale(0.6)}to{opacity:1;transform:scale(1)}}' +
     '@keyframes ea-widget-in{from{opacity:0;transform:translateY(16px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}' +
-    '@keyframes ea-glow-pulse{0%,100%{box-shadow:0 4px 24px rgba(' + rgb + ',0.5),0 0 0 0 rgba(' + rgb + ',0.3)}' +
-    '50%{box-shadow:0 6px 32px rgba(' + rgb + ',0.7),0 0 0 8px rgba(' + rgb + ',0)}}';
+    '@keyframes ea-ring-pulse{0%{transform:scale(1);opacity:0.6}70%{transform:scale(1.55);opacity:0}100%{transform:scale(1.55);opacity:0}}' +
+    '@keyframes ea-ring2-pulse{0%{transform:scale(1);opacity:0.35}70%{transform:scale(1.9);opacity:0}100%{transform:scale(1.9);opacity:0}}';
   document.head.appendChild(style);
 
   /* ── 5. Build the FAB bubble ─────────────────────────────────────────────── */
-  var fab = document.createElement('button');
-  fab.setAttribute('aria-label', 'Open chat');
-  fab.innerHTML =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-    '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' +
-    '</svg>';
-
-  Object.assign(fab.style, {
+  var fabWrap = document.createElement('div');
+  Object.assign(fabWrap.style, {
     position: 'fixed',
     bottom: '24px',
     right: '24px',
     zIndex: '2147483647',
     width: '60px',
     height: '60px',
+  });
+
+  /* Outer glow ring 2 (slowest) */
+  var ring2 = document.createElement('span');
+  Object.assign(ring2.style, {
+    position: 'absolute',
+    inset: '0',
+    borderRadius: '50%',
+    background: 'rgba(' + rgb + ',0.25)',
+    animation: 'ea-ring2-pulse 2.8s ease-out 0.4s infinite',
+    pointerEvents: 'none',
+  });
+
+  /* Outer glow ring 1 */
+  var ring1 = document.createElement('span');
+  Object.assign(ring1.style, {
+    position: 'absolute',
+    inset: '0',
+    borderRadius: '50%',
+    background: 'rgba(' + rgb + ',0.35)',
+    animation: 'ea-ring-pulse 2.8s ease-out infinite',
+    pointerEvents: 'none',
+  });
+
+  var fab = document.createElement('button');
+  fab.setAttribute('aria-label', 'Open chat');
+  fab.innerHTML = '<span style="font-family:Georgia,\'Times New Roman\',serif;font-size:22px;font-weight:700;color:#fff;line-height:1;letter-spacing:-0.02em;user-select:none">V</span>';
+
+  Object.assign(fab.style, {
+    position: 'absolute',
+    inset: '0',
     borderRadius: '50%',
     border: 'none',
     cursor: 'pointer',
-    background: brandColor,
+    background: 'radial-gradient(circle at 35% 35%, ' + brandColor + ' 0%, rgba(' + rgb + ',0.85) 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 4px 24px rgba(' + rgb + ',0.5)',
-    animation: 'ea-pop-in 0.4s cubic-bezier(0.34,1.4,0.64,1) 0.5s both, ea-glow-pulse 2.5s ease-in-out 1s infinite',
-    transition: 'transform 0.15s ease',
+    boxShadow: '0 4px 20px rgba(' + rgb + ',0.55), inset 0 1px 0 rgba(255,255,255,0.2)',
+    animation: 'ea-pop-in 0.45s cubic-bezier(0.34,1.4,0.64,1) 0.5s both',
+    transition: 'transform 0.15s ease, box-shadow 0.2s ease',
   });
 
-  fab.addEventListener('mouseover', function () { fab.style.transform = 'scale(1.1)'; });
-  fab.addEventListener('mouseout',  function () { fab.style.transform = 'scale(1)'; });
+  fab.addEventListener('mouseover', function () {
+    fab.style.transform = 'scale(1.1)';
+    fab.style.boxShadow = '0 6px 28px rgba(' + rgb + ',0.75), inset 0 1px 0 rgba(255,255,255,0.2)';
+  });
+  fab.addEventListener('mouseout', function () {
+    fab.style.transform = 'scale(1)';
+    fab.style.boxShadow = '0 4px 20px rgba(' + rgb + ',0.55), inset 0 1px 0 rgba(255,255,255,0.2)';
+  });
+
+  fabWrap.appendChild(ring2);
+  fabWrap.appendChild(ring1);
+  fabWrap.appendChild(fab);
 
   /* ── 6. Build the widget container ──────────────────────────────────────── */
   var container = document.createElement('div');
@@ -86,8 +121,10 @@
   function applyContainerSize() {
     if (isMobile()) {
       Object.assign(container.style, {
-        bottom: '0',
-        right: '0',
+        top: '0',
+        left: '0',
+        bottom: 'auto',
+        right: 'auto',
         width: '100vw',
         height: '100vh',
         maxWidth: '100vw',
@@ -97,6 +134,8 @@
       });
     } else {
       Object.assign(container.style, {
+        top: 'auto',
+        left: 'auto',
         bottom: '96px',
         right: '16px',
         width: '380px',
@@ -148,15 +187,8 @@
   /* ── 8. Toggle logic ─────────────────────────────────────────────────────── */
   var isOpen = false;
 
-  var closeIcon =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.5" stroke-linecap="round">' +
-    '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>' +
-    '</svg>';
-
-  var chatIcon =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-    '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' +
-    '</svg>';
+  var closeInner = '<span style="font-family:Georgia,\'Times New Roman\',serif;font-size:22px;font-weight:700;color:#fff;line-height:1;letter-spacing:-0.02em;user-select:none;opacity:0.85">✕</span>';
+  var vInner    = '<span style="font-family:Georgia,\'Times New Roman\',serif;font-size:22px;font-weight:700;color:#fff;line-height:1;letter-spacing:-0.02em;user-select:none">V</span>';
 
   function openWidget() {
     isOpen = true;
@@ -164,7 +196,7 @@
     container.style.display = 'block';
     container.style.animation = 'ea-widget-in 0.28s cubic-bezier(0.22,1,0.36,1) both';
     overlay.style.display = isMobile() ? 'none' : 'block';
-    fab.innerHTML = closeIcon;
+    fab.innerHTML = closeInner;
     fab.setAttribute('aria-label', 'Close chat');
   }
 
@@ -172,7 +204,7 @@
     isOpen = false;
     container.style.display = 'none';
     overlay.style.display = 'none';
-    fab.innerHTML = chatIcon;
+    fab.innerHTML = vInner;
     fab.setAttribute('aria-label', 'Open chat');
   }
 
@@ -189,7 +221,7 @@
   function mount() {
     document.body.appendChild(overlay);
     document.body.appendChild(container);
-    document.body.appendChild(fab);
+    document.body.appendChild(fabWrap);
   }
 
   if (document.readyState === 'loading') {
