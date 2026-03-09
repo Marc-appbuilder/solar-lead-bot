@@ -109,6 +109,17 @@ export default function ChatWidget({ clientId, config }: Props) {
         body: JSON.stringify({ clientId, messages: history }),
       });
 
+      if (res.status === 429) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? { ...m, content: "I need a quick breather — give me a few minutes and I'll be right back with you! ☕" }
+              : m
+          )
+        );
+        return;
+      }
+
       if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
 
       const reader = res.body.getReader();

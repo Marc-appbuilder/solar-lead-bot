@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   if (!checkRateLimit(ip)) {
     return NextResponse.json(
-      { error: 'Too many messages — please wait a few minutes.' },
+      { rateLimited: true },
       { status: 429 }
     );
   }
