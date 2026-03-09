@@ -108,8 +108,8 @@
     if (isMobile()) {
       Object.assign(container.style, {
         top: '0', left: '0', bottom: 'auto', right: 'auto',
-        width: '100vw', height: '100vh',
-        maxWidth: '100vw', maxHeight: '100vh',
+        width: '100vw', height: '100dvh',
+        maxWidth: '100vw', maxHeight: '100dvh',
         borderRadius: '0', boxShadow: 'none',
       });
     } else {

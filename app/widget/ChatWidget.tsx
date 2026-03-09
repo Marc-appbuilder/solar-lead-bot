@@ -181,7 +181,7 @@ export default function ChatWidget({ clientId, config }: Props) {
     <div style={{
       display: 'flex',
       flexDirection: 'column',
-      height: '100vh',
+      height: '100dvh',  /* dvh shrinks when the mobile keyboard opens */
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       fontSize: '15px',
       background: '#0d0f14',
@@ -383,6 +383,7 @@ export default function ChatWidget({ clientId, config }: Props) {
       <div style={{
         flexShrink: 0,
         padding: '12px 14px',
+        paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
         display: 'flex',
         alignItems: 'flex-end',
         gap: '10px',
@@ -402,9 +403,10 @@ export default function ChatWidget({ clientId, config }: Props) {
             flex: 1,
             resize: 'none',
             borderRadius: '14px',
-            padding: '11px 14px',
-            fontSize: '14px',
+            padding: '13px 16px',
+            fontSize: '16px',   /* 16px prevents iOS auto-zoom on focus */
             lineHeight: 1.5,
+            minHeight: '50px',
             maxHeight: '120px',
             overflowY: 'auto',
             background: '#1a1d26',
@@ -412,6 +414,7 @@ export default function ChatWidget({ clientId, config }: Props) {
             fontFamily: 'inherit',
             opacity: streaming ? 0.5 : 1,
             fieldSizing: 'content',
+            WebkitAppearance: 'none',
           } as React.CSSProperties}
         />
 
@@ -421,8 +424,8 @@ export default function ChatWidget({ clientId, config }: Props) {
           className={`vaughan-send ${canSend ? 'vaughan-send-active' : ''}`}
           style={{
             flexShrink: 0,
-            width: '46px',
-            height: '46px',
+            width: '50px',
+            height: '50px',
             borderRadius: '50%',
             border: 'none',
             cursor: canSend ? 'pointer' : 'not-allowed',
