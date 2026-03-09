@@ -6,12 +6,49 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+/* ── Rate limiting ─────────────────────────────────────────────────────────
+   In-memory store: fine for a single serverless instance / dev.
+   For multi-region production, swap for Redis/Upstash.               ───── */
+const RATE_LIMIT = 20;          // max messages
+const WINDOW_MS  = 10 * 60 * 1000; // 10 minutes
+const MAX_MSG_LEN = 500;         // chars — longer messages are truncated
+
+const ipCounts = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = ipCounts.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    ipCounts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+    return true;
+  }
+
+  if (entry.count >= RATE_LIMIT) return false;
+
+  entry.count += 1;
+  return true;
+}
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
 }
 
 export async function POST(req: NextRequest) {
+  // Rate limit by IP
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+    req.headers.get('x-real-ip') ??
+    'unknown';
+
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: 'Too many messages — please wait a few minutes.' },
+      { status: 429 }
+    );
+  }
+
   let clientId: string;
   let messages: ChatMessage[];
 
@@ -27,10 +64,13 @@ export async function POST(req: NextRequest) {
 
   const config = getClient(clientId);
 
-  // Validate message structure before sending to Anthropic
+  // Validate and truncate messages before sending to Anthropic
   const sanitisedMessages = messages
     .filter((m) => m.role === 'user' || m.role === 'assistant')
-    .map((m) => ({ role: m.role, content: String(m.content) }));
+    .map((m) => ({
+      role: m.role,
+      content: String(m.content).slice(0, MAX_MSG_LEN),
+    }));
 
   const encoder = new TextEncoder();
 
