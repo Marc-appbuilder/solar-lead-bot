@@ -52,7 +52,7 @@ function TypingDots({ colour }: { colour: string }) {
             borderRadius: '50%',
             background: colour,
             opacity: 0.8,
-            animation: `monty-bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
+            animation: `vaughan-bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
           }}
         />
       ))}
@@ -190,42 +190,42 @@ export default function ChatWidget({ clientId, config }: Props) {
 
       {/* ── Injected keyframes ── */}
       <style>{`
-        @keyframes monty-bounce {
+        @keyframes vaughan-bounce {
           0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
           30% { transform: translateY(-5px); opacity: 1; }
         }
-        @keyframes monty-fade-up {
+        @keyframes vaughan-fade-up {
           from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes monty-glow-pulse {
+        @keyframes vaughan-glow-pulse {
           0%, 100% { box-shadow: 0 0 0 0 rgba(${rgb}, 0), 0 4px 20px rgba(${rgb}, 0.5); }
           50%       { box-shadow: 0 0 0 10px rgba(${rgb}, 0), 0 4px 32px rgba(${rgb}, 0.8); }
         }
-        @keyframes monty-online-pulse {
+        @keyframes vaughan-online-pulse {
           0%, 100% { opacity: 1; transform: scale(1); }
           50%       { opacity: 0.5; transform: scale(0.8); }
         }
-        @keyframes monty-header-shimmer {
+        @keyframes vaughan-header-shimmer {
           0%   { background-position: 0% 50%; }
           50%  { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
-        .monty-msg { animation: monty-fade-up 0.25s cubic-bezier(0.22, 1, 0.36, 1) both; }
-        .monty-send-active { animation: monty-glow-pulse 1.8s ease-in-out infinite; }
-        .monty-online { animation: monty-online-pulse 2s ease-in-out infinite; }
-        .monty-input {
+        .vaughan-msg { animation: vaughan-fade-up 0.25s cubic-bezier(0.22, 1, 0.36, 1) both; }
+        .vaughan-send-active { animation: vaughan-glow-pulse 1.8s ease-in-out infinite; }
+        .vaughan-online { animation: vaughan-online-pulse 2s ease-in-out infinite; }
+        .vaughan-input {
           transition: box-shadow 0.2s ease, border-color 0.2s ease;
           border: 1.5px solid rgba(255,255,255,0.08);
         }
-        .monty-input:focus {
+        .vaughan-input:focus {
           outline: none;
           border-color: rgba(${rgb}, 0.5);
           box-shadow: 0 0 0 3px rgba(${rgb}, 0.15), 0 0 20px rgba(${rgb}, 0.1);
         }
-        .monty-send { transition: transform 0.15s ease, box-shadow 0.2s ease; }
-        .monty-send:not(:disabled):hover { transform: scale(1.1); }
-        .monty-send:not(:disabled):active { transform: scale(0.93); }
+        .vaughan-send { transition: transform 0.15s ease, box-shadow 0.2s ease; }
+        .vaughan-send:not(:disabled):hover { transform: scale(1.1); }
+        .vaughan-send:not(:disabled):active { transform: scale(0.93); }
 
         /* Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
@@ -293,7 +293,7 @@ export default function ChatWidget({ clientId, config }: Props) {
 
         {/* Online indicator */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-          <span className="monty-online" style={{
+          <span className="vaughan-online" style={{
             display: 'block',
             width: '8px',
             height: '8px',
@@ -322,7 +322,7 @@ export default function ChatWidget({ clientId, config }: Props) {
           return (
             <div
               key={msg.id}
-              className="monty-msg"
+              className="vaughan-msg"
               style={{
                 display: 'flex',
                 justifyContent: isUser ? 'flex-end' : 'flex-start',
@@ -391,7 +391,7 @@ export default function ChatWidget({ clientId, config }: Props) {
       }}>
         <textarea
           ref={inputRef}
-          className="monty-input"
+          className="vaughan-input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -418,7 +418,7 @@ export default function ChatWidget({ clientId, config }: Props) {
         <button
           onClick={handleSend}
           disabled={!canSend}
-          className={`monty-send ${canSend ? 'monty-send-active' : ''}`}
+          className={`vaughan-send ${canSend ? 'vaughan-send-active' : ''}`}
           style={{
             flexShrink: 0,
             width: '46px',

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add public/embed.js)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(vercel --prod)",
+      "Bash(git add app/layout.tsx app/page.tsx app/widget/ChatWidget.tsx public/embed.js public/test.html)",
+      "Bash(git add app/api/chat/route.ts)",
+      "Bash(git add app/api/chat/route.ts app/widget/ChatWidget.tsx)",
+      "Bash(git add -A)"
+    ]
+  }
+}
