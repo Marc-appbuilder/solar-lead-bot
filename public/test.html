@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EstateAssist Widget Test</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f4f0;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e5e5e5;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a365d;
+    }
+
+    header span {
+      font-size: 12px;
+      background: #e8f0fe;
+      color: #1a56db;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-weight: 500;
+    }
+
+    main {
+      max-width: 760px;
+      margin: 64px auto;
+      padding: 0 24px;
+    }
+
+    h2 {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+
+    p {
+      color: #555;
+      font-size: 15px;
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 32px;
+    }
+
+    .card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 14px;
+      color: #333;
+    }
+
+    code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 40px;
+      font-size: 13px;
+      color: #999;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Glade Tech</h1>
+    <span>Widget Test Page</span>
+  </header>
+
+  <main>
+    <h2>This is a sample Glade Tech website.</h2>
+    <p>
+      This page simulates a third-party site with the Monty widget embedded.
+      The chat tab should appear on the right-hand side of the screen.
+    </p>
+    <p>
+      Click <strong>Chat with us</strong> to open the widget and test the conversation
+      flow with Monty (Glade Tech).
+    </p>
+
+    <div class="card">
+      <h3>Embed config</h3>
+      <p>
+        <code>clientId=glade-tech</code> &nbsp;·&nbsp;
+        <code>origin=http://localhost:3001</code>
+      </p>
+    </div>
+
+    <div class="hint">
+      <div class="dot"></div>
+      Widget loaded from <code>http://localhost:3001/embed.js</code>
+    </div>
+  </main>
+
+  <script src="http://localhost:3001/embed.js?clientId=glade-tech" async></script>
+
+</body>
+</html>

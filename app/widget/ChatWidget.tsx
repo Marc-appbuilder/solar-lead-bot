@@ -1,0 +1,452 @@
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import type { ClientConfig } from '@/lib/clients';
+import type { ChatMessage } from '@/app/api/chat/route';
+
+interface Props {
+  clientId: string;
+  config: ClientConfig;
+}
+
+interface Message extends ChatMessage {
+  id: string;
+}
+
+function uid() {
+  return Math.random().toString(36).slice(2);
+}
+
+function contrastColour(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.55 ? '#111111' : '#ffffff';
+}
+
+function hexToRgb(hex: string) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `${r}, ${g}, ${b}`;
+}
+
+function lighten(hex: string, amount = 40): string {
+  const r = Math.min(255, parseInt(hex.slice(1, 3), 16) + amount);
+  const g = Math.min(255, parseInt(hex.slice(3, 5), 16) + amount);
+  const b = Math.min(255, parseInt(hex.slice(5, 7), 16) + amount);
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+function TypingDots({ colour }: { colour: string }) {
+  return (
+    <span className="inline-flex gap-1.5 items-center h-5">
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          style={{
+            display: 'block',
+            width: '7px',
+            height: '7px',
+            borderRadius: '50%',
+            background: colour,
+            opacity: 0.8,
+            animation: `monty-bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
+          }}
+        />
+      ))}
+    </span>
+  );
+}
+
+export default function ChatWidget({ clientId, config }: Props) {
+  const brand = config.brandColour;
+  const fg = contrastColour(brand);
+  const rgb = hexToRgb(brand);
+  const brandLight = lighten(brand, 40);
+
+  const [messages, setMessages] = useState<Message[]>([
+    { id: uid(), role: 'assistant', content: config.openingMessage },
+  ]);
+  const [input, setInput] = useState('');
+  const [streaming, setStreaming] = useState(false);
+  const [streamingId, setStreamingId] = useState<string | null>(null);
+
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  async function handleSend() {
+    const text = input.trim();
+    if (!text || streaming) return;
+
+    const userMsg: Message = { id: uid(), role: 'user', content: text };
+    const assistantId = uid();
+    const assistantMsg: Message = { id: assistantId, role: 'assistant', content: '' };
+
+    setMessages((prev) => [...prev, userMsg, assistantMsg]);
+    setInput('');
+    setStreaming(true);
+    setStreamingId(assistantId);
+
+    try {
+      const history: ChatMessage[] = [...messages, userMsg].map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, messages: history }),
+      });
+
+      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const raw = line.slice(6).trim();
+          if (raw === '[DONE]') break;
+
+          try {
+            const parsed = JSON.parse(raw);
+            if (parsed.error) throw new Error(parsed.error);
+            if (parsed.text) {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantId ? { ...m, content: m.content + parsed.text } : m
+                )
+              );
+            }
+          } catch (parseErr) {
+            console.warn('[chat] parse error:', parseErr);
+          }
+        }
+      }
+    } catch {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantId
+            ? { ...m, content: 'Sorry, something went wrong. Please try again.' }
+            : m
+        )
+      );
+    } finally {
+      setStreaming(false);
+      setStreamingId(null);
+    }
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  }
+
+  const canSend = input.trim() && !streaming;
+
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+      fontSize: '15px',
+      background: '#0d0f14',
+      WebkitFontSmoothing: 'antialiased',
+    }}>
+
+      {/* ── Injected keyframes ── */}
+      <style>{`
+        @keyframes monty-bounce {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+          30% { transform: translateY(-5px); opacity: 1; }
+        }
+        @keyframes monty-fade-up {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes monty-glow-pulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(${rgb}, 0), 0 4px 20px rgba(${rgb}, 0.5); }
+          50%       { box-shadow: 0 0 0 10px rgba(${rgb}, 0), 0 4px 32px rgba(${rgb}, 0.8); }
+        }
+        @keyframes monty-online-pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50%       { opacity: 0.5; transform: scale(0.8); }
+        }
+        @keyframes monty-header-shimmer {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .monty-msg { animation: monty-fade-up 0.25s cubic-bezier(0.22, 1, 0.36, 1) both; }
+        .monty-send-active { animation: monty-glow-pulse 1.8s ease-in-out infinite; }
+        .monty-online { animation: monty-online-pulse 2s ease-in-out infinite; }
+        .monty-input {
+          transition: box-shadow 0.2s ease, border-color 0.2s ease;
+          border: 1.5px solid rgba(255,255,255,0.08);
+        }
+        .monty-input:focus {
+          outline: none;
+          border-color: rgba(${rgb}, 0.5);
+          box-shadow: 0 0 0 3px rgba(${rgb}, 0.15), 0 0 20px rgba(${rgb}, 0.1);
+        }
+        .monty-send { transition: transform 0.15s ease, box-shadow 0.2s ease; }
+        .monty-send:not(:disabled):hover { transform: scale(1.1); }
+        .monty-send:not(:disabled):active { transform: scale(0.93); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+      `}</style>
+
+      {/* ── Header ── */}
+      <header style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '16px 18px',
+        flexShrink: 0,
+        background: `linear-gradient(135deg, #0a0c10 0%, #111520 40%, rgba(${rgb}, 0.25) 100%)`,
+        borderBottom: `1px solid rgba(${rgb}, 0.2)`,
+        boxShadow: `0 1px 0 rgba(${rgb}, 0.15), 0 8px 32px rgba(0,0,0,0.5)`,
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Glow accent line at top */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '2px',
+          background: `linear-gradient(90deg, transparent, ${brand}, ${brandLight}, transparent)`,
+          opacity: 0.9,
+        }} />
+
+        {/* Avatar */}
+        <div style={{
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '15px',
+          fontWeight: 700,
+          flexShrink: 0,
+          background: `linear-gradient(135deg, ${brand} 0%, ${brandLight} 100%)`,
+          color: fg,
+          boxShadow: `0 0 0 2px rgba(${rgb}, 0.3), 0 0 20px rgba(${rgb}, 0.4)`,
+        }}>
+          {config.name.charAt(0)}
+        </div>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{
+            margin: 0,
+            fontWeight: 700,
+            fontSize: '14px',
+            color: '#ffffff',
+            lineHeight: 1.3,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}>
+            {config.name}
+          </p>
+          <p style={{ margin: 0, fontSize: '11px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.3 }}>AI Assistant</p>
+        </div>
+
+        {/* Online indicator */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+          <span className="monty-online" style={{
+            display: 'block',
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            background: '#4ade80',
+            boxShadow: '0 0 10px 4px rgba(74,222,128,0.6)',
+          }} />
+          <span style={{ fontSize: '11px', fontWeight: 500, color: 'rgba(255,255,255,0.5)' }}>Online</span>
+        </div>
+      </header>
+
+      {/* ── Messages ── */}
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: '20px 16px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        background: 'linear-gradient(180deg, #0d0f14 0%, #0f1219 100%)',
+      }}>
+        {messages.map((msg) => {
+          const isUser = msg.role === 'user';
+          const isStreamingThis = msg.id === streamingId;
+
+          return (
+            <div
+              key={msg.id}
+              className="monty-msg"
+              style={{
+                display: 'flex',
+                justifyContent: isUser ? 'flex-end' : 'flex-start',
+                alignItems: 'flex-end',
+                gap: '8px',
+              }}
+            >
+              {/* Bot avatar */}
+              {!isUser && (
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  flexShrink: 0,
+                  background: `linear-gradient(135deg, ${brand} 0%, ${brandLight} 100%)`,
+                  color: fg,
+                  boxShadow: `0 0 12px rgba(${rgb}, 0.5)`,
+                }}>
+                  {config.name.charAt(0)}
+                </div>
+              )}
+
+              {/* Bubble */}
+              <div style={{
+                maxWidth: '76%',
+                padding: '11px 15px',
+                borderRadius: isUser ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                fontSize: '14px',
+                lineHeight: 1.6,
+                whiteSpace: 'pre-wrap',
+                ...(isUser ? {
+                  background: `linear-gradient(135deg, ${brand} 0%, ${brandLight} 100%)`,
+                  color: '#ffffff',
+                  boxShadow: `0 4px 24px rgba(${rgb}, 0.5), 0 0 0 1px rgba(${rgb}, 0.3)`,
+                } : {
+                  background: '#1a1d26',
+                  color: '#e8eaf0',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06)',
+                }),
+              }}>
+                {isStreamingThis && !msg.content
+                  ? <TypingDots colour={brand} />
+                  : msg.content
+                }
+              </div>
+            </div>
+          );
+        })}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* ── Input bar ── */}
+      <div style={{
+        flexShrink: 0,
+        padding: '12px 14px',
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: '10px',
+        background: '#12151c',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <textarea
+          ref={inputRef}
+          className="monty-input"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Type a message…"
+          rows={1}
+          disabled={streaming}
+          style={{
+            flex: 1,
+            resize: 'none',
+            borderRadius: '14px',
+            padding: '11px 14px',
+            fontSize: '14px',
+            lineHeight: 1.5,
+            maxHeight: '120px',
+            overflowY: 'auto',
+            background: '#1a1d26',
+            color: '#e8eaf0',
+            fontFamily: 'inherit',
+            opacity: streaming ? 0.5 : 1,
+            fieldSizing: 'content',
+          } as React.CSSProperties}
+        />
+
+        <button
+          onClick={handleSend}
+          disabled={!canSend}
+          className={`monty-send ${canSend ? 'monty-send-active' : ''}`}
+          style={{
+            flexShrink: 0,
+            width: '46px',
+            height: '46px',
+            borderRadius: '50%',
+            border: 'none',
+            cursor: canSend ? 'pointer' : 'not-allowed',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: canSend
+              ? `linear-gradient(135deg, ${brand} 0%, ${brandLight} 100%)`
+              : 'rgba(255,255,255,0.08)',
+            color: canSend ? '#ffffff' : 'rgba(255,255,255,0.2)',
+            transition: 'background 0.2s ease',
+          }}
+          aria-label="Send"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="17" height="17">
+            <path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.405Z" />
+          </svg>
+        </button>
+      </div>
+
+      {/* ── Footer ── */}
+      <p style={{
+        textAlign: 'center',
+        fontSize: '10px',
+        padding: '6px 0 7px',
+        margin: 0,
+        flexShrink: 0,
+        background: '#12151c',
+        color: 'rgba(255,255,255,0.2)',
+        letterSpacing: '0.01em',
+        borderTop: '1px solid rgba(255,255,255,0.04)',
+      }}>
+        Powered by{' '}
+        <span style={{ color: brand, fontWeight: 700 }}>Monty</span>
+      </p>
+    </div>
+  );
+}
