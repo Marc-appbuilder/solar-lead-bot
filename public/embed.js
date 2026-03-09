@@ -1,12 +1,12 @@
 /**
- * EstateAssist embed script
+ * Monty embed script
  *
  * Usage — paste before </body> on any page:
  *   <script src="https://your-domain.com/embed.js?clientId=demo" async></script>
  *
  * Optional query params:
  *   clientId  — which agent config to load  (default: "demo")
- *   color     — override the tab hex color  (default: "#1a365d")
+ *   color     — override brand hex color    (default: "#1a365d")
  */
 (function () {
   'use strict';
@@ -22,111 +22,104 @@
   var srcUrl = new URL(scriptEl.src);
   var origin = srcUrl.origin;
   var clientId = srcUrl.searchParams.get('clientId') || 'demo';
-  var tabColor = srcUrl.searchParams.get('color') || '#1a365d';
+  var brandColor = srcUrl.searchParams.get('color') || '#1a365d';
 
-  /* Derive a legible foreground colour for any background hex */
-  function contrastColor(hex) {
-    var r = parseInt(hex.slice(1, 3), 16);
-    var g = parseInt(hex.slice(3, 5), 16);
-    var b = parseInt(hex.slice(5, 7), 16);
-    return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.55 ? '#111111' : '#ffffff';
+  /* RGB components for glow shadows */
+  function hexRgb(hex) {
+    return parseInt(hex.slice(1, 3), 16) + ',' +
+           parseInt(hex.slice(3, 5), 16) + ',' +
+           parseInt(hex.slice(5, 7), 16);
   }
-  var tabFg = contrastColor(tabColor);
+  var rgb = hexRgb(brandColor);
 
   /* ── 2. Avoid double-init ────────────────────────────────────────────────── */
   if (window.__montyLoaded) return;
   window.__montyLoaded = true;
 
-  /* ── 3. Animations ───────────────────────────────────────────────────────── */
+  /* ── 3. Detect mobile ────────────────────────────────────────────────────── */
+  function isMobile() {
+    return window.innerWidth <= 640;
+  }
+
+  /* ── 4. Animations ───────────────────────────────────────────────────────── */
   var style = document.createElement('style');
-  style.textContent = [
-    /* Tab slides in from the right edge with a spring */
-    '@keyframes ea-tab-in{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}',
-    /* Widget pops up from bottom-right */
-    '@keyframes ea-widget-in{from{opacity:0;transform:translateY(16px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}',
-  ].join('');
+  style.textContent =
+    '@keyframes ea-pop-in{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}' +
+    '@keyframes ea-widget-in{from{opacity:0;transform:translateY(16px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}' +
+    '@keyframes ea-glow-pulse{0%,100%{box-shadow:0 4px 24px rgba(' + rgb + ',0.5),0 0 0 0 rgba(' + rgb + ',0.3)}' +
+    '50%{box-shadow:0 6px 32px rgba(' + rgb + ',0.7),0 0 0 8px rgba(' + rgb + ',0)}}';
   document.head.appendChild(style);
 
-  /* ── 4. Build the sticky tab ─────────────────────────────────────────────── */
-  var tab = document.createElement('button');
-  tab.setAttribute('aria-label', 'Open property chat');
-
-  /* Pill shape flush with the right edge — rounded on left, flat on right */
-  Object.assign(tab.style, {
-    position: 'fixed',
-    right: '0',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    zIndex: '2147483647',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '13px 18px 13px 16px',
-    border: 'none',
-    borderRadius: '10px 0 0 10px',
-    cursor: 'pointer',
-    background: tabColor,
-    boxShadow: '-4px 0 24px rgba(0,0,0,0.18)',
-    color: tabFg,
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif',
-    fontSize: '13.5px',
-    fontWeight: '600',
-    letterSpacing: '0.01em',
-    whiteSpace: 'nowrap',
-    lineHeight: '1',
-    /* Spring entrance — delayed slightly so page loads first */
-    animation: 'ea-tab-in 0.55s cubic-bezier(0.34,1.4,0.64,1) 0.6s both',
-    transition: 'background 0.2s ease, box-shadow 0.2s ease, padding-right 0.2s ease',
-    WebkitFontSmoothing: 'antialiased',
-  });
-
-  var chatIcon =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">' +
+  /* ── 5. Build the FAB bubble ─────────────────────────────────────────────── */
+  var fab = document.createElement('button');
+  fab.setAttribute('aria-label', 'Open chat');
+  fab.innerHTML =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
     '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' +
     '</svg>';
 
-  function setTabIdle() {
-    tab.innerHTML = chatIcon + '<span>Chat with us</span>';
-    tab.setAttribute('aria-label', 'Open property chat');
-  }
-
-  function setTabActive() {
-    var closeIcon =
-      '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0">' +
-      '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>' +
-      '</svg>';
-    tab.innerHTML = closeIcon + '<span>Close</span>';
-    tab.setAttribute('aria-label', 'Close property chat');
-  }
-
-  setTabIdle();
-
-  /* Hover: nudge left slightly to hint it's clickable */
-  tab.addEventListener('mouseover', function () {
-    tab.style.paddingRight = '22px';
-    tab.style.boxShadow = '-6px 0 28px rgba(0,0,0,0.26)';
-  });
-  tab.addEventListener('mouseout', function () {
-    tab.style.paddingRight = '18px';
-    tab.style.boxShadow = '-4px 0 24px rgba(0,0,0,0.18)';
-  });
-
-  /* ── 5. Build the widget container ──────────────────────────────────────── */
-  var container = document.createElement('div');
-  Object.assign(container.style, {
+  Object.assign(fab.style, {
     position: 'fixed',
     bottom: '24px',
-    right: '16px',
+    right: '24px',
+    zIndex: '2147483647',
+    width: '60px',
+    height: '60px',
+    borderRadius: '50%',
+    border: 'none',
+    cursor: 'pointer',
+    background: brandColor,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 4px 24px rgba(' + rgb + ',0.5)',
+    animation: 'ea-pop-in 0.4s cubic-bezier(0.34,1.4,0.64,1) 0.5s both, ea-glow-pulse 2.5s ease-in-out 1s infinite',
+    transition: 'transform 0.15s ease',
+  });
+
+  fab.addEventListener('mouseover', function () { fab.style.transform = 'scale(1.1)'; });
+  fab.addEventListener('mouseout',  function () { fab.style.transform = 'scale(1)'; });
+
+  /* ── 6. Build the widget container ──────────────────────────────────────── */
+  var container = document.createElement('div');
+
+  function applyContainerSize() {
+    if (isMobile()) {
+      Object.assign(container.style, {
+        bottom: '0',
+        right: '0',
+        width: '100vw',
+        height: '100vh',
+        maxWidth: '100vw',
+        maxHeight: '100vh',
+        borderRadius: '0',
+        boxShadow: 'none',
+      });
+    } else {
+      Object.assign(container.style, {
+        bottom: '96px',
+        right: '16px',
+        width: '380px',
+        height: '580px',
+        maxWidth: 'calc(100vw - 24px)',
+        maxHeight: 'calc(100vh - 120px)',
+        borderRadius: '16px',
+        boxShadow: '0 12px 48px rgba(0,0,0,0.28)',
+      });
+    }
+  }
+
+  Object.assign(container.style, {
+    position: 'fixed',
     zIndex: '2147483646',
-    width: '380px',
-    height: '580px',
-    maxWidth: 'calc(100vw - 24px)',
-    maxHeight: 'calc(100vh - 40px)',
-    borderRadius: '16px',
     overflow: 'hidden',
-    boxShadow: '0 12px 48px rgba(0,0,0,0.22)',
     display: 'none',
     transformOrigin: 'bottom right',
+  });
+  applyContainerSize();
+
+  window.addEventListener('resize', function () {
+    if (isOpen) applyContainerSize();
   });
 
   var iframe = document.createElement('iframe');
@@ -137,13 +130,12 @@
     width: '100%',
     height: '100%',
     border: 'none',
-    borderRadius: '16px',
     display: 'block',
   });
 
   container.appendChild(iframe);
 
-  /* ── 6. Close-on-outside-click overlay ──────────────────────────────────── */
+  /* ── 7. Close-on-outside-click overlay ──────────────────────────────────── */
   var overlay = document.createElement('div');
   Object.assign(overlay.style, {
     position: 'fixed',
@@ -153,38 +145,51 @@
   });
   overlay.addEventListener('click', closeWidget);
 
-  /* ── 7. Toggle logic ─────────────────────────────────────────────────────── */
+  /* ── 8. Toggle logic ─────────────────────────────────────────────────────── */
   var isOpen = false;
+
+  var closeIcon =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.5" stroke-linecap="round">' +
+    '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>' +
+    '</svg>';
+
+  var chatIcon =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' +
+    '</svg>';
 
   function openWidget() {
     isOpen = true;
+    applyContainerSize();
     container.style.display = 'block';
     container.style.animation = 'ea-widget-in 0.28s cubic-bezier(0.22,1,0.36,1) both';
-    overlay.style.display = 'block';
-    setTabActive();
+    overlay.style.display = isMobile() ? 'none' : 'block';
+    fab.innerHTML = closeIcon;
+    fab.setAttribute('aria-label', 'Close chat');
   }
 
   function closeWidget() {
     isOpen = false;
     container.style.display = 'none';
     overlay.style.display = 'none';
-    setTabIdle();
+    fab.innerHTML = chatIcon;
+    fab.setAttribute('aria-label', 'Open chat');
   }
 
-  tab.addEventListener('click', function () {
+  fab.addEventListener('click', function () {
     if (isOpen) { closeWidget(); } else { openWidget(); }
   });
 
-  /* ── 8. Escape to close ──────────────────────────────────────────────────── */
+  /* ── 9. Escape to close ──────────────────────────────────────────────────── */
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && isOpen) closeWidget();
   });
 
-  /* ── 9. Mount ────────────────────────────────────────────────────────────── */
+  /* ── 10. Mount ───────────────────────────────────────────────────────────── */
   function mount() {
     document.body.appendChild(overlay);
     document.body.appendChild(container);
-    document.body.appendChild(tab);
+    document.body.appendChild(fab);
   }
 
   if (document.readyState === 'loading') {
