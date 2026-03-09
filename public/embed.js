@@ -46,8 +46,7 @@
   style.textContent =
     '@keyframes ea-pop-in{from{opacity:0;transform:scale(0.6)}to{opacity:1;transform:scale(1)}}' +
     '@keyframes ea-widget-in{from{opacity:0;transform:translateY(16px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}' +
-    '@keyframes ea-ring-pulse{0%{transform:scale(1);opacity:0.6}70%{transform:scale(1.55);opacity:0}100%{transform:scale(1.55);opacity:0}}' +
-    '@keyframes ea-ring2-pulse{0%{transform:scale(1);opacity:0.35}70%{transform:scale(1.9);opacity:0}100%{transform:scale(1.9);opacity:0}}';
+    '@keyframes ea-radar{0%{transform:scale(1);opacity:0.7}100%{transform:scale(2.2);opacity:0}}';
   document.head.appendChild(style);
 
   /* ── 5. Build the FAB bubble ─────────────────────────────────────────────── */
@@ -57,35 +56,33 @@
     bottom: '24px',
     right: '24px',
     zIndex: '2147483647',
-    width: '60px',
-    height: '60px',
+    width: '64px',
+    height: '64px',
   });
 
-  /* Outer glow ring 2 (slowest) */
-  var ring2 = document.createElement('span');
-  Object.assign(ring2.style, {
+  /* Radar ping — single ring, expands and fades every 2s */
+  var radar = document.createElement('span');
+  Object.assign(radar.style, {
     position: 'absolute',
     inset: '0',
     borderRadius: '50%',
-    background: 'rgba(' + rgb + ',0.25)',
-    animation: 'ea-ring2-pulse 2.8s ease-out 0.4s infinite',
+    border: '2px solid rgba(' + rgb + ',0.7)',
+    animation: 'ea-radar 2s cubic-bezier(0.2,0.6,0.4,1) 1.2s infinite',
     pointerEvents: 'none',
-  });
-
-  /* Outer glow ring 1 */
-  var ring1 = document.createElement('span');
-  Object.assign(ring1.style, {
-    position: 'absolute',
-    inset: '0',
-    borderRadius: '50%',
-    background: 'rgba(' + rgb + ',0.35)',
-    animation: 'ea-ring-pulse 2.8s ease-out infinite',
-    pointerEvents: 'none',
+    boxSizing: 'border-box',
   });
 
   var fab = document.createElement('button');
   fab.setAttribute('aria-label', 'Open chat');
-  fab.innerHTML = '<span style="font-family:Georgia,\'Times New Roman\',serif;font-size:22px;font-weight:700;color:#fff;line-height:1;letter-spacing:-0.02em;user-select:none">V</span>';
+
+  /* Speech bubble with lightning bolt inside */
+  fab.innerHTML =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">' +
+      /* Rounded speech bubble body */
+      '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h15A2.5 2.5 0 0 1 24 5.5v11A2.5 2.5 0 0 1 21.5 19H15l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 16.5V5.5Z" fill="white" opacity="0.95"/>' +
+      /* Lightning bolt */
+      '<path d="M15.5 8l-3 5h2.5l-1 5 4-6h-2.5l1.5-4z" fill="' + brandColor + '"/>' +
+    '</svg>';
 
   Object.assign(fab.style, {
     position: 'absolute',
@@ -93,26 +90,25 @@
     borderRadius: '50%',
     border: 'none',
     cursor: 'pointer',
-    background: 'radial-gradient(circle at 35% 35%, ' + brandColor + ' 0%, rgba(' + rgb + ',0.85) 100%)',
+    background: 'linear-gradient(135deg, ' + brandColor + ' 0%, rgba(' + rgb + ',0.8) 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 4px 20px rgba(' + rgb + ',0.55), inset 0 1px 0 rgba(255,255,255,0.2)',
+    boxShadow: '0 4px 22px rgba(' + rgb + ',0.6), inset 0 1px 0 rgba(255,255,255,0.25)',
     animation: 'ea-pop-in 0.45s cubic-bezier(0.34,1.4,0.64,1) 0.5s both',
     transition: 'transform 0.15s ease, box-shadow 0.2s ease',
   });
 
   fab.addEventListener('mouseover', function () {
     fab.style.transform = 'scale(1.1)';
-    fab.style.boxShadow = '0 6px 28px rgba(' + rgb + ',0.75), inset 0 1px 0 rgba(255,255,255,0.2)';
+    fab.style.boxShadow = '0 6px 30px rgba(' + rgb + ',0.8), inset 0 1px 0 rgba(255,255,255,0.25)';
   });
   fab.addEventListener('mouseout', function () {
     fab.style.transform = 'scale(1)';
-    fab.style.boxShadow = '0 4px 20px rgba(' + rgb + ',0.55), inset 0 1px 0 rgba(255,255,255,0.2)';
+    fab.style.boxShadow = '0 4px 22px rgba(' + rgb + ',0.6), inset 0 1px 0 rgba(255,255,255,0.25)';
   });
 
-  fabWrap.appendChild(ring2);
-  fabWrap.appendChild(ring1);
+  fabWrap.appendChild(radar);
   fabWrap.appendChild(fab);
 
   /* ── 6. Build the widget container ──────────────────────────────────────── */
@@ -187,8 +183,16 @@
   /* ── 8. Toggle logic ─────────────────────────────────────────────────────── */
   var isOpen = false;
 
-  var closeInner = '<span style="font-family:Georgia,\'Times New Roman\',serif;font-size:22px;font-weight:700;color:#fff;line-height:1;letter-spacing:-0.02em;user-select:none;opacity:0.85">✕</span>';
-  var vInner    = '<span style="font-family:Georgia,\'Times New Roman\',serif;font-size:22px;font-weight:700;color:#fff;line-height:1;letter-spacing:-0.02em;user-select:none">V</span>';
+  var chatInner =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">' +
+      '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h15A2.5 2.5 0 0 1 24 5.5v11A2.5 2.5 0 0 1 21.5 19H15l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 16.5V5.5Z" fill="white" opacity="0.95"/>' +
+      '<path d="M15.5 8l-3 5h2.5l-1 5 4-6h-2.5l1.5-4z" fill="' + brandColor + '"/>' +
+    '</svg>';
+
+  var closeInner =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">' +
+      '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>' +
+    '</svg>';
 
   function openWidget() {
     isOpen = true;
@@ -204,7 +208,7 @@
     isOpen = false;
     container.style.display = 'none';
     overlay.style.display = 'none';
-    fab.innerHTML = vInner;
+    fab.innerHTML = chatInner;
     fab.setAttribute('aria-label', 'Open chat');
   }
 
