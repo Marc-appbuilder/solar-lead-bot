@@ -4,6 +4,15 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Allow the API to be called from any origin (widget iframe is cross-origin)
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,POST,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type' },
+        ],
+      },
+      {
         // Allow the widget page to be embedded in iframes on any origin
         source: '/widget',
         headers: [
@@ -16,6 +25,8 @@ const nextConfig: NextConfig = {
         source: '/embed.js',
         headers: [
           { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Cache-Control', value: 'public, max-age=3600' },
         ],
       },
