@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
 import { getClient } from '@/lib/clients';
 
@@ -7,58 +7,11 @@ export interface LeadPayload {
   name: string;
   email: string;
   phone?: string;
-  /** Optional: first message or note from the user */
-  note?: string;
+  summary?: string;
 }
 
-function createTransport() {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT ?? 587),
-    secure: Number(process.env.SMTP_PORT) === 465,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-}
-
-function buildHtml(lead: LeadPayload, agencyName: string): string {
-  return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <style>
-    body { font-family: Arial, sans-serif; color: #222; margin: 0; padding: 0; }
-    .header { background: #1a365d; color: #fff; padding: 24px 32px; }
-    .header h1 { margin: 0; font-size: 20px; }
-    .body { padding: 32px; }
-    table { border-collapse: collapse; width: 100%; max-width: 480px; }
-    td { padding: 10px 14px; border: 1px solid #e2e8f0; vertical-align: top; }
-    td:first-child { background: #f7fafc; font-weight: bold; width: 130px; }
-    .note { margin-top: 24px; background: #f7fafc; border-left: 4px solid #1a365d;
-            padding: 14px 18px; border-radius: 4px; white-space: pre-wrap; }
-    .footer { margin-top: 32px; font-size: 12px; color: #718096; }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <h1>New Lead — ${agencyName}</h1>
-  </div>
-  <div class="body">
-    <p>A new lead has been captured via the EstateAssist widget.</p>
-    <table>
-      <tr><td>Name</td><td>${escapeHtml(lead.name)}</td></tr>
-      <tr><td>Email</td><td><a href="mailto:${escapeHtml(lead.email)}">${escapeHtml(lead.email)}</a></td></tr>
-      ${lead.phone ? `<tr><td>Phone</td><td><a href="tel:${escapeHtml(lead.phone)}">${escapeHtml(lead.phone)}</a></td></tr>` : ''}
-      <tr><td>Time</td><td>${new Date().toUTCString()}</td></tr>
-    </table>
-    ${lead.note ? `<div class="note"><strong>Message:</strong>\n${escapeHtml(lead.note)}</div>` : ''}
-    <div class="footer">Sent automatically by EstateAssist</div>
-  </div>
-</body>
-</html>`;
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY ?? 're_placeholder');
 }
 
 function escapeHtml(str: string): string {
@@ -67,6 +20,45 @@ function escapeHtml(str: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body { font-family: Arial, sans-serif; color: #222; margin: 0; padding: 0; background: #f5f5f5; }
+    .wrapper { max-width: 560px; margin: 32px auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .header { background: ${brandColour}; color: #fff; padding: 24px 32px; }
+    .header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+    .header p { margin: 4px 0 0; font-size: 13px; opacity: 0.8; }
+    .body { padding: 28px 32px; }
+    table { border-collapse: collapse; width: 100%; }
+    td { padding: 10px 14px; border: 1px solid #e8e8e8; vertical-align: top; font-size: 14px; }
+    td:first-child { background: #f9f9f9; font-weight: 600; width: 120px; color: #555; }
+    .summary { margin-top: 20px; background: #f9f9f9; border-left: 4px solid ${brandColour}; padding: 14px 18px; border-radius: 4px; font-size: 14px; white-space: pre-wrap; color: #333; }
+    .footer { margin-top: 24px; font-size: 11px; color: #aaa; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <h1>New lead from Vaughan — ${escapeHtml(clientName)}</h1>
+      <p>${new Date().toUTCString()}</p>
+    </div>
+    <div class="body">
+      <table>
+        <tr><td>Name</td><td>${escapeHtml(lead.name)}</td></tr>
+        <tr><td>Email</td><td><a href="mailto:${escapeHtml(lead.email)}" style="color:${brandColour}">${escapeHtml(lead.email)}</a></td></tr>
+        ${lead.phone ? `<tr><td>Phone</td><td><a href="tel:${escapeHtml(lead.phone)}" style="color:${brandColour}">${escapeHtml(lead.phone)}</a></td></tr>` : ''}
+      </table>
+      ${lead.summary ? `<div class="summary"><strong>What they were looking for:</strong>\n${escapeHtml(lead.summary)}</div>` : ''}
+      <div class="footer">Sent automatically by Vaughan</div>
+    </div>
+  </div>
+</body>
+</html>`;
 }
 
 export async function POST(req: NextRequest) {
@@ -78,7 +70,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
 
-  const { clientId, name, email, phone, note } = body;
+  const { clientId, name, email, phone, summary } = body;
 
   if (!clientId || !name?.trim() || !email?.trim()) {
     return NextResponse.json(
@@ -87,24 +79,22 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Basic email format check
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
   }
 
   const config = getClient(clientId);
-  const transport = createTransport();
 
-  try {
-    await transport.sendMail({
-      from: process.env.SMTP_FROM ?? `"EstateAssist" <${process.env.SMTP_USER}>`,
-      to: config.agentEmail,
-      replyTo: email,
-      subject: `New lead from ${name} — ${config.name}`,
-      html: buildHtml({ clientId, name, email, phone, note }, config.name),
-    });
-  } catch (err) {
-    console.error('[lead] email send failed:', err);
+  const { error } = await getResend().emails.send({
+    from: 'Vaughan <leads@notifications.vaughan.ai>',
+    to: config.agentEmail,
+    replyTo: email,
+    subject: `New lead from Vaughan — ${config.name}`,
+    html: buildHtml({ clientId, name, email, phone, summary }, config.name, config.brandColour),
+  });
+
+  if (error) {
+    console.error('[lead] resend error:', error);
     return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
   }
 
