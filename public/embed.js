@@ -213,6 +213,16 @@
       isOpen = false;
       container.style.display = 'none';
       overlay.style.display   = 'none';
+      fabWrap.style.display   = 'flex';
+    }
+  });
+
+  window.addEventListener('message', function (e) {
+    if (e.data === 'vaughan:close' && isOpen) {
+      isOpen = false;
+      container.style.display = 'none';
+      overlay.style.display   = 'none';
+      fabWrap.style.display   = 'flex';
     }
   });
 

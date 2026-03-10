@@ -303,6 +303,30 @@ export default function ChatWidget({ clientId, config }: Props) {
           }} />
           <span style={{ fontSize: '11px', fontWeight: 500, color: 'rgba(255,255,255,0.5)' }}>Online</span>
         </div>
+
+        {/* Close button — always visible so users can dismiss the widget */}
+        <button
+          onClick={() => window.parent.postMessage('vaughan:close', '*')}
+          aria-label="Close chat"
+          style={{
+            flexShrink: 0,
+            marginLeft: '4px',
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            border: 'none',
+            background: 'rgba(255,255,255,0.08)',
+            color: 'rgba(255,255,255,0.6)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </header>
 
       {/* ── Messages ── */}
