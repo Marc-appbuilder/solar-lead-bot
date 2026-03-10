@@ -143,7 +143,11 @@
   /* Overlay */
   var overlay = document.createElement('div');
   Object.assign(overlay.style, { position: 'fixed', inset: '0', zIndex: '2147483645', display: 'none' });
-  overlay.addEventListener('click', closeWidget);
+  overlay.addEventListener('click', function () {
+    isOpen = false;
+    container.style.display = 'none';
+    overlay.style.display   = 'none';
+  });
 
   /* ── 5. Apply brand colour (called once colour is resolved) ─────────────── */
   var closeInner =
