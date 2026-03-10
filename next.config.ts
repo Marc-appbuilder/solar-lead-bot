@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
           { key: 'Access-Control-Allow-Origin', value: '*' },
           { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Cache-Control', value: 'public, max-age=3600' },
+          { key: 'Cache-Control', value: 'no-cache, must-revalidate' },
         ],
       },
     ];
