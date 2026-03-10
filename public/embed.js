@@ -186,8 +186,9 @@
     fab.addEventListener('click', function () {
       if (isOpen) {
         isOpen = false;
-        container.style.display = 'none';
-        overlay.style.display   = 'none';
+        container.style.display  = 'none';
+        overlay.style.display    = 'none';
+        fabWrap.style.display    = 'flex';
         fab.innerHTML = chatInner;
         fab.setAttribute('aria-label', 'Open chat');
       } else {
@@ -196,6 +197,8 @@
         container.style.display   = 'block';
         container.style.animation = 'ea-widget-in 0.28s cubic-bezier(0.22,1,0.36,1) both';
         overlay.style.display     = isMobile() ? 'none' : 'block';
+        /* Hide FAB on mobile — it sits over the send button */
+        fabWrap.style.display     = isMobile() ? 'none' : 'flex';
         fab.innerHTML = closeInner;
         fab.setAttribute('aria-label', 'Close chat');
       }
