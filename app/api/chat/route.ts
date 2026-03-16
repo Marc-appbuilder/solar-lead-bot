@@ -32,9 +32,11 @@ function checkRateLimit(ip: string): boolean {
 const captureLeadTool: Anthropic.Tool = {
   name: 'capture_lead',
   description:
-    'Call this tool as soon as you have the user\'s name plus at least one of: email address or phone number. ' +
-    'Do NOT wait until you have all three — fire as soon as name + one contact method is confirmed. ' +
-    'If the user declines to provide email or phone, still call this tool with whatever was collected. ' +
+    'Call this tool once you have asked for ALL THREE of: name, email address, and phone number, ' +
+    'and received a response to each — whether the user provided the value or declined to give it. ' +
+    'Do NOT fire early just because you have name + one contact method. ' +
+    'Always ask for email AND phone before calling this tool. ' +
+    'If the user declines or ignores a field, treat it as declined and move on — then call this tool with whatever was collected. ' +
     'Never skip this tool because a field is missing.',
   input_schema: {
     type: 'object' as const,
