@@ -177,7 +177,7 @@ Close with: "Perfect — Marc will be in touch very shortly. Looking forward to 
 
 Always collect name, email and phone before closing. Never invent details not listed above.`,
     agentEmail: 'marc@gladetech.co.uk',
-    brandColour: '#0f1f3d',
+    brandColour: '#b8882e',
   },
 
   'glade-tech': {
