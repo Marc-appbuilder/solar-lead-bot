@@ -32,17 +32,19 @@ function checkRateLimit(ip: string): boolean {
 const captureLeadTool: Anthropic.Tool = {
   name: 'capture_lead',
   description:
-    'Call this tool once you have collected the user\'s name and email address. ' +
-    'Pass all details you have gathered so far.',
+    'Call this tool as soon as you have the user\'s name plus at least one of: email address or phone number. ' +
+    'Do NOT wait until you have all three — fire as soon as name + one contact method is confirmed. ' +
+    'If the user declines to provide email or phone, still call this tool with whatever was collected. ' +
+    'Never skip this tool because a field is missing.',
   input_schema: {
     type: 'object' as const,
     properties: {
       name:    { type: 'string', description: 'Full name of the lead' },
-      email:   { type: 'string', description: 'Email address of the lead' },
-      phone:   { type: 'string', description: 'Phone number if provided' },
-      summary: { type: 'string', description: 'A one or two sentence summary of what they are looking for' },
+      email:   { type: 'string', description: 'Email address, or omit if not provided' },
+      phone:   { type: 'string', description: 'Phone number, or omit if not provided' },
+      summary: { type: 'string', description: 'One or two sentence summary of what they are looking for' },
     },
-    required: ['name', 'email'],
+    required: ['name'],
   },
 };
 
@@ -80,8 +82,8 @@ function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): 
   <div class="body">
     <table>
       <tr><td>Name</td><td>${escapeHtml(lead.name)}</td></tr>
-      <tr><td>Email</td><td><a href="mailto:${escapeHtml(lead.email)}" style="color:${brandColour}">${escapeHtml(lead.email)}</a></td></tr>
-      ${lead.phone ? `<tr><td>Phone</td><td><a href="tel:${escapeHtml(lead.phone)}" style="color:${brandColour}">${escapeHtml(lead.phone)}</a></td></tr>` : ''}
+      <tr><td>Email</td><td>${lead.email ? `<a href="mailto:${escapeHtml(lead.email)}" style="color:${brandColour}">${escapeHtml(lead.email)}</a>` : '<span style="color:#aaa">Not provided</span>'}</td></tr>
+      <tr><td>Phone</td><td>${lead.phone ? `<a href="tel:${escapeHtml(lead.phone)}" style="color:${brandColour}">${escapeHtml(lead.phone)}</a>` : '<span style="color:#aaa">Not provided</span>'}</td></tr>
     </table>
     ${lead.summary ? `<div class="summary"><strong>What they were looking for:</strong>\n${escapeHtml(lead.summary)}</div>` : ''}
     <div class="footer">Sent automatically by Vaughan</div>
@@ -95,7 +97,7 @@ async function sendLeadEmail(lead: LeadPayload, clientId: string) {
   const { error } = await getResend().emails.send({
     from: 'Vaughan <onboarding@resend.dev>',
     to: config.notificationEmail,
-    replyTo: lead.email,
+    ...(lead.email ? { replyTo: lead.email } : {}),
     subject: `New lead from Vaughan — ${config.name}`,
     html: buildHtml(lead, config.name, config.brandColour),
   });
@@ -187,8 +189,8 @@ export async function POST(req: NextRequest) {
           console.error('[chat] failed to parse tool input:', toolRawInput);
         }
 
-        // Fire email (non-blocking)
-        if (toolInput.name && toolInput.email) {
+        // Fire email as long as we have name + at least one contact method
+        if (toolInput.name && (toolInput.email || toolInput.phone)) {
           sendLeadEmail(toolInput, clientId).catch(console.error);
         }
 

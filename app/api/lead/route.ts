@@ -5,7 +5,7 @@ import { getClient } from '@/lib/clients';
 export interface LeadPayload {
   clientId: string;
   name: string;
-  email: string;
+  email?: string;
   phone?: string;
   summary?: string;
 }
@@ -50,8 +50,8 @@ function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): 
     <div class="body">
       <table>
         <tr><td>Name</td><td>${escapeHtml(lead.name)}</td></tr>
-        <tr><td>Email</td><td><a href="mailto:${escapeHtml(lead.email)}" style="color:${brandColour}">${escapeHtml(lead.email)}</a></td></tr>
-        ${lead.phone ? `<tr><td>Phone</td><td><a href="tel:${escapeHtml(lead.phone)}" style="color:${brandColour}">${escapeHtml(lead.phone)}</a></td></tr>` : ''}
+        <tr><td>Email</td><td>${lead.email ? `<a href="mailto:${escapeHtml(lead.email)}" style="color:${brandColour}">${escapeHtml(lead.email)}</a>` : '<span style="color:#aaa">Not provided</span>'}</td></tr>
+        <tr><td>Phone</td><td>${lead.phone ? `<a href="tel:${escapeHtml(lead.phone)}" style="color:${brandColour}">${escapeHtml(lead.phone)}</a>` : '<span style="color:#aaa">Not provided</span>'}</td></tr>
       </table>
       ${lead.summary ? `<div class="summary"><strong>What they were looking for:</strong>\n${escapeHtml(lead.summary)}</div>` : ''}
       <div class="footer">Sent automatically by Vaughan</div>
@@ -72,14 +72,14 @@ export async function POST(req: NextRequest) {
 
   const { clientId, name, email, phone, summary } = body;
 
-  if (!clientId || !name?.trim() || !email?.trim()) {
+  if (!clientId || !name?.trim() || (!email?.trim() && !phone?.trim())) {
     return NextResponse.json(
-      { error: 'clientId, name, and email are required' },
+      { error: 'clientId, name, and at least one of email or phone are required' },
       { status: 400 }
     );
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
   }
 
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
   const { error } = await getResend().emails.send({
     from: 'Vaughan <leads@notifications.vaughan.ai>',
     to: config.notificationEmail,
-    replyTo: email,
+    ...(email ? { replyTo: email } : {}),
     subject: `New lead from Vaughan — ${config.name}`,
     html: buildHtml({ clientId, name, email, phone, summary }, config.name, config.brandColour),
   });

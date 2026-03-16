@@ -44,7 +44,7 @@ If they ask about a specific property or price: "Our team will have the very lat
 
 If they're just browsing: "No problem — a free valuation is always a great starting point with zero commitment. Want me to get one booked in?"
 
-Always collect name and email before closing. Never invent prices, availability or property details.`,
+Always try to collect name, email and phone number before closing. If the user declines to give one, move on and close with whatever you have — never block on a missing field.  Never invent prices, availability or property details.`,
     agentEmail: 'demo@estateassist.example.com',
     notificationEmail: 'demo@estateassist.example.com',
     brandColour: '#1a365d',
@@ -84,7 +84,7 @@ Say: "Our team will have the very latest details on that — may I take your nam
 If they say they're just browsing:
 Say: "Of course — a complimentary valuation is always a good place to start, with no obligation. Shall I arrange one for you?"
 
-Always collect name and email before ending. Never invent prices or availability.`,
+Always try to collect name, email and phone. If the user declines one, move on and close with whatever you have. Never invent prices or availability.`,
     agentEmail: 'london@savills.example.com',
     notificationEmail: 'london@savills.example.com',
     brandColour: '#003c71',
@@ -124,7 +124,7 @@ Say: "Good shout — our team will have the freshest info on that. Can I grab yo
 If they say they're just browsing:
 Say: "Totally fine — a free valuation is a great no-commitment starting point. Want me to get one booked in?"
 
-Always collect name and email before ending. Never invent prices or availability.`,
+Always try to collect name, email and phone. If the user declines one, move on and close with whatever you have. Never invent prices or availability.`,
     agentEmail: 'chelsea@foxtons.example.com',
     notificationEmail: 'chelsea@foxtons.example.com',
     brandColour: '#e63946',
@@ -151,7 +151,7 @@ If a landlord wants to let:
 Ask one at a time: property address → bedrooms → furnished or unfurnished → full management or tenant find → full name → email → phone number.
 Close with: "Brilliant — the lettings team will be in touch very shortly. We'll make the whole process stress-free!"
 
-Always collect name, email and phone number before closing. Never invent prices, availability or property details.`,
+Always try to collect name, email and phone number. If the user declines one, move on and close with whatever you have — never block on a missing field. Never invent prices, availability or property details.`,
     agentEmail: 'info@avenue-estates.co.uk',
     notificationEmail: 'info@avenue-estates.co.uk',
     brandColour: '#1c1c1c',
@@ -180,7 +180,7 @@ If someone wants to get started or find out more:
 Ask one at a time: full name → email address → phone number.
 Close with: "Perfect — Marc will be in touch very shortly. Looking forward to getting you set up!"
 
-Always collect name, email and phone before closing. Never invent details not listed above.`,
+Always try to collect name, email and phone. If the user declines one, move on and close with whatever you have — never block on a missing field. Never invent details not listed above.`,
     agentEmail: 'marc@gladetech.co.uk',
     notificationEmail: 'marc@gladetech.uk',
     brandColour: '#b8882e',
@@ -208,7 +208,7 @@ Close: "Brilliant — the Glade Tech team will be in touch very soon, [name]. Ex
 
 If they're just exploring: "No problem at all — happy to answer any questions about how we work. What would you like to know?"
 
-Always collect name and email before closing.`,
+Always try to collect name, email and phone. If the user declines one, move on and close with whatever you have.`,
     agentEmail: 'marc@gladetech.co.uk',
     notificationEmail: 'marc@gladetech.co.uk',
     brandColour: '#10b981',
