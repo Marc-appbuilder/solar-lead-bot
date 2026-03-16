@@ -94,7 +94,7 @@ async function sendLeadEmail(lead: LeadPayload, clientId: string) {
   const config = getClient(clientId);
   const { error } = await getResend().emails.send({
     from: 'Vaughan <onboarding@resend.dev>',
-    to: config.agentEmail,
+    to: config.notificationEmail,
     replyTo: lead.email,
     subject: `New lead from Vaughan — ${config.name}`,
     html: buildHtml(lead, config.name, config.brandColour),

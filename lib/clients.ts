@@ -3,6 +3,7 @@ export interface ClientConfig {
   openingMessage: string;
   systemPrompt: string;
   agentEmail: string;
+  notificationEmail: string;
   brandColour: string;
 }
 
@@ -45,6 +46,7 @@ If they're just browsing: "No problem — a free valuation is always a great sta
 
 Always collect name and email before closing. Never invent prices, availability or property details.`,
     agentEmail: 'demo@estateassist.example.com',
+    notificationEmail: 'demo@estateassist.example.com',
     brandColour: '#1a365d',
   },
 
@@ -84,6 +86,7 @@ Say: "Of course — a complimentary valuation is always a good place to start, w
 
 Always collect name and email before ending. Never invent prices or availability.`,
     agentEmail: 'london@savills.example.com',
+    notificationEmail: 'london@savills.example.com',
     brandColour: '#003c71',
   },
 
@@ -123,6 +126,7 @@ Say: "Totally fine — a free valuation is a great no-commitment starting point.
 
 Always collect name and email before ending. Never invent prices or availability.`,
     agentEmail: 'chelsea@foxtons.example.com',
+    notificationEmail: 'chelsea@foxtons.example.com',
     brandColour: '#e63946',
   },
 
@@ -149,6 +153,7 @@ Close with: "Brilliant — the lettings team will be in touch very shortly. We'l
 
 Always collect name, email and phone number before closing. Never invent prices, availability or property details.`,
     agentEmail: 'info@avenue-estates.co.uk',
+    notificationEmail: 'info@avenue-estates.co.uk',
     brandColour: '#1c1c1c',
   },
 
@@ -177,6 +182,7 @@ Close with: "Perfect — Marc will be in touch very shortly. Looking forward to 
 
 Always collect name, email and phone before closing. Never invent details not listed above.`,
     agentEmail: 'marc@gladetech.co.uk',
+    notificationEmail: 'marc@gladetech.uk',
     brandColour: '#b8882e',
   },
 
@@ -204,6 +210,7 @@ If they're just exploring: "No problem at all — happy to answer any questions 
 
 Always collect name and email before closing.`,
     agentEmail: 'marc@gladetech.co.uk',
+    notificationEmail: 'marc@gladetech.co.uk',
     brandColour: '#10b981',
   },
 };

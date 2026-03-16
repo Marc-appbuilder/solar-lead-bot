@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
 
   const { error } = await getResend().emails.send({
     from: 'Vaughan <leads@notifications.vaughan.ai>',
-    to: config.agentEmail,
+    to: config.notificationEmail,
     replyTo: email,
     subject: `New lead from Vaughan — ${config.name}`,
     html: buildHtml({ clientId, name, email, phone, summary }, config.name, config.brandColour),
