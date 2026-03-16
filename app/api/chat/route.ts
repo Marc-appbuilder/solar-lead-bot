@@ -78,7 +78,7 @@ function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): 
 <body>
 <div class="wrapper">
   <div class="header">
-    <h1>New lead from Vaughan — ${escapeHtml(clientName)}</h1>
+    <h1>New lead — ${escapeHtml(clientName)}</h1>
     <p>${new Date().toUTCString()}</p>
   </div>
   <div class="body">
@@ -88,7 +88,7 @@ function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): 
       <tr><td>Phone</td><td>${lead.phone ? `<a href="tel:${escapeHtml(lead.phone)}" style="color:${brandColour}">${escapeHtml(lead.phone)}</a>` : '<span style="color:#aaa">Not provided</span>'}</td></tr>
     </table>
     ${lead.summary ? `<div class="summary"><strong>What they were looking for:</strong>\n${escapeHtml(lead.summary)}</div>` : ''}
-    <div class="footer">Sent automatically by Vaughan</div>
+    <div class="footer">Sent automatically by VaughanAI</div>
   </div>
 </div>
 </body></html>`;
@@ -97,10 +97,10 @@ function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): 
 async function sendLeadEmail(lead: LeadPayload, clientId: string) {
   const config = getClient(clientId);
   const { error } = await getResend().emails.send({
-    from: 'Vaughan <leads@vaughanai.co>',
+    from: 'VaughanAI <leads@vaughanai.co>',
     to: config.notificationEmail,
     ...(lead.email ? { replyTo: lead.email } : {}),
-    subject: `New lead from Vaughan — ${config.name}`,
+    subject: `New lead — ${config.name}`,
     html: buildHtml(lead, config.name, config.brandColour),
   });
   if (error) console.error('[lead] resend error:', error);

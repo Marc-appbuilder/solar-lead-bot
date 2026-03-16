@@ -182,7 +182,7 @@ Close with: "Perfect — Marc will be in touch very shortly. Looking forward to 
 
 Always try to collect name, email and phone. If the user declines one, move on and close with whatever you have — never block on a missing field. Never invent details not listed above.`,
     agentEmail: 'marc@gladetech.co.uk',
-    notificationEmail: 'marc@gladetech.uk',
+    notificationEmail: 'marcwrichards@gmail.com',
     brandColour: '#b8882e',
   },
 
