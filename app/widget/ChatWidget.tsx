@@ -288,7 +288,7 @@ export default function ChatWidget({ clientId, config }: Props) {
           }}>
             {config.name}
           </p>
-          <p style={{ margin: 0, fontSize: '11px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.3 }}>AI Assistant</p>
+          <p style={{ margin: 0, fontSize: '11px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.3 }}>Virtual Assistant</p>
         </div>
 
         {/* Online indicator */}
@@ -478,11 +478,11 @@ export default function ChatWidget({ clientId, config }: Props) {
         background: '#12151c',
         borderTop: '1px solid rgba(255,255,255,0.04)',
       }}>
-        <p style={{ margin: 0, fontSize: '10px', color: 'rgba(255,255,255,0.2)', letterSpacing: '0.01em' }}>
+        <p style={{ margin: 0, fontSize: '10px', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
           Powered by{' '}
-          <span style={{ color: brand, fontWeight: 700 }}>Vaughan</span>
+          <span style={{ color: brand, fontWeight: 700 }}>VaughanAI</span>
         </p>
-        <p style={{ margin: 0, fontSize: '9px', color: 'rgba(255,255,255,0.12)', letterSpacing: '0.04em', marginTop: '1px' }}>
+        <p style={{ margin: 0, fontSize: '9px', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.04em', marginTop: '1px' }}>
           Your first response, every time.
         </p>
       </div>
