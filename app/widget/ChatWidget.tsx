@@ -480,7 +480,7 @@ export default function ChatWidget({ clientId, config }: Props) {
       }}>
         <p style={{ margin: 0, fontSize: '10px', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
           Powered by{' '}
-          <span style={{ color: brand, fontWeight: 700 }}>VaughanAI</span>
+          <span style={{ color: '#b8882e', fontWeight: 700 }}>VaughanAI</span>
         </p>
         <p style={{ margin: 0, fontSize: '9px', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.04em', marginTop: '1px' }}>
           Your first response, every time.
