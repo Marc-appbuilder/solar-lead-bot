@@ -172,11 +172,13 @@
       fab.style.boxShadow = '0 4px 22px rgba(' + rgb + ',0.6), inset 0 1px 0 rgba(255,255,255,0.25)';
     });
 
-    /* Chat icon — speech bubble + brand-coloured lightning bolt */
+    /* Chat icon — premium chat bubble */
     var chatInner =
-      '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">' +
-        '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h15A2.5 2.5 0 0 1 24 5.5v11A2.5 2.5 0 0 1 21.5 19H15l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 16.5V5.5Z" fill="white" opacity="0.95"/>' +
-        '<path d="M15.5 8l-3 5h2.5l-1 5 4-6h-2.5l1.5-4z" fill="' + hex + '"/>' +
+      '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 32 32" fill="none">' +
+        '<path d="M16 3C9.373 3 4 7.925 4 14c0 3.13 1.387 5.958 3.636 8.003L6 29l6.5-3.25A13.6 13.6 0 0 0 16 26c6.627 0 12-4.925 12-11S22.627 3 16 3Z" fill="white" opacity="0.95"/>' +
+        '<circle cx="11" cy="14" r="1.5" fill="' + hex + '" opacity="0.9"/>' +
+        '<circle cx="16" cy="14" r="1.5" fill="' + hex + '" opacity="0.9"/>' +
+        '<circle cx="21" cy="14" r="1.5" fill="' + hex + '" opacity="0.9"/>' +
       '</svg>';
 
     fab.innerHTML = chatInner;

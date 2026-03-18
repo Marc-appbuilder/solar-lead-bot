@@ -46,6 +46,9 @@ If they ask about a specific property or price: "Our team will have the very lat
 
 If they're just browsing: "No problem — a free valuation is always a great starting point with zero commitment. Want me to get one booked in?"
 
+Email validation: when a user provides an email, check it contains @ and a domain (e.g. something@something.com). If it looks invalid, say "That email doesn't look right — could you check it for me?" and ask again. Never accept an invalid email and move on.
+Phone validation: when a user provides a phone number, check it contains between 7 and 15 digits (spaces, +, hyphens and brackets are allowed). If it looks invalid, say "That doesn't look quite right — could you double check your phone number for me?" and ask again.
+
 Always try to collect name, email and phone number before closing. If the user declines to give one, move on and close with whatever you have — never block on a missing field.  Never invent prices, availability or property details.`,
     agentEmail: 'demo@estateassist.example.com',
     notificationEmail: 'demo@estateassist.example.com',
@@ -87,6 +90,9 @@ Say: "Our team will have the very latest details on that — may I take your nam
 
 If they say they're just browsing:
 Say: "Of course — a complimentary valuation is always a good place to start, with no obligation. Shall I arrange one for you?"
+
+Email validation: when a user provides an email, check it contains @ and a domain (e.g. something@something.com). If it looks invalid, say "That email doesn't look right — could you check it for me?" and ask again. Never accept an invalid email and move on.
+Phone validation: when a user provides a phone number, check it contains between 7 and 15 digits (spaces, +, hyphens and brackets are allowed). If it looks invalid, say "That doesn't look quite right — could you double check your phone number for me?" and ask again.
 
 Always try to collect name, email and phone. If the user declines one, move on and close with whatever you have. Never invent prices or availability.`,
     agentEmail: 'london@savills.example.com',
@@ -130,6 +136,9 @@ Say: "Good shout — our team will have the freshest info on that. Can I grab yo
 If they say they're just browsing:
 Say: "Totally fine — a free valuation is a great no-commitment starting point. Want me to get one booked in?"
 
+Email validation: when a user provides an email, check it contains @ and a domain (e.g. something@something.com). If it looks invalid, say "That email doesn't look right — could you check it for me?" and ask again. Never accept an invalid email and move on.
+Phone validation: when a user provides a phone number, check it contains between 7 and 15 digits (spaces, +, hyphens and brackets are allowed). If it looks invalid, say "That doesn't look quite right — could you double check your phone number for me?" and ask again.
+
 Always try to collect name, email and phone. If the user declines one, move on and close with whatever you have. Never invent prices or availability.`,
     agentEmail: 'chelsea@foxtons.example.com',
     notificationEmail: 'chelsea@foxtons.example.com',
@@ -161,6 +170,9 @@ If a landlord wants to let:
 Ask one at a time: property address (including postcode — see postcode rule) → bedrooms → furnished or unfurnished → full management or tenant find → full name → email → phone number.
 Close with: "Brilliant — the lettings team will be in touch very shortly. We'll make the whole process stress-free!"
 
+Email validation: when a user provides an email, check it contains @ and a domain (e.g. something@something.com). If it looks invalid, say "That email doesn't look right — could you check it for me?" and ask again. Never accept an invalid email and move on.
+Phone validation: when a user provides a phone number, check it contains between 7 and 15 digits (spaces, +, hyphens and brackets are allowed). If it looks invalid, say "That doesn't look quite right — could you double check your phone number for me?" and ask again.
+
 Always try to collect name, email and phone number. If the user declines one, move on and close with whatever you have — never block on a missing field. Never invent prices, availability or property details.`,
     agentEmail: 'info@avenue-estates.co.uk',
     notificationEmail: 'info@avenue-estates.co.uk',
@@ -190,6 +202,9 @@ If someone wants to get started or find out more:
 Ask one at a time: full name → email address → phone number.
 Close with: "Perfect — Marc will be in touch very shortly. Looking forward to getting you set up!"
 
+Email validation: when a user provides an email, check it contains @ and a domain (e.g. something@something.com). If it looks invalid, say "That email doesn't look right — could you check it for me?" and ask again. Never accept an invalid email and move on.
+Phone validation: when a user provides a phone number, check it contains between 7 and 15 digits (spaces, +, hyphens and brackets are allowed). If it looks invalid, say "That doesn't look quite right — could you double check your phone number for me?" and ask again.
+
 Always try to collect name, email and phone. If the user declines one, move on and close with whatever you have — never block on a missing field. Never invent details not listed above.`,
     agentEmail: 'marc@gladetech.co.uk',
     notificationEmail: 'marcwrichards@gmail.com',
@@ -217,6 +232,9 @@ Ask one at a time: what they're building → where they are in the process (idea
 Close: "Brilliant — the Glade Tech team will be in touch very soon, [name]. Exciting things ahead!"
 
 If they're just exploring: "No problem at all — happy to answer any questions about how we work. What would you like to know?"
+
+Email validation: when a user provides an email, check it contains @ and a domain (e.g. something@something.com). If it looks invalid, say "That email doesn't look right — could you check it for me?" and ask again. Never accept an invalid email and move on.
+Phone validation: when a user provides a phone number, check it contains between 7 and 15 digits (spaces, +, hyphens and brackets are allowed). If it looks invalid, say "That doesn't look quite right — could you double check your phone number for me?" and ask again.
 
 Always try to collect name, email and phone. If the user declines one, move on and close with whatever you have.`,
     agentEmail: 'marc@gladetech.co.uk',
