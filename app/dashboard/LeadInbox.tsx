@@ -168,18 +168,20 @@ export default function LeadInbox() {
         top: 0,
         zIndex: 10,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-          <span style={{ fontWeight: 700, fontSize: '20px', flex: 1 }}>Lead Inbox</span>
-          <a href="/admin" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>Admin ↗</a>
-          {newCount > 0 && (
-            <span style={{
-              background: '#b8882e', color: '#fff',
-              fontSize: '11px', fontWeight: 700,
-              borderRadius: '99px', padding: '2px 8px',
-            }}>
-              {newCount} new
-            </span>
-          )}
+        {/* Row 1: title + sign out */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontWeight: 700, fontSize: '20px' }}>Lead Inbox</span>
+            {newCount > 0 && (
+              <span style={{
+                background: '#b8882e', color: '#fff',
+                fontSize: '11px', fontWeight: 700,
+                borderRadius: '99px', padding: '2px 8px',
+              }}>
+                {newCount} new
+              </span>
+            )}
+          </div>
           <button
             onClick={async () => {
               const supabase = createBrowserClient(
@@ -192,11 +194,15 @@ export default function LeadInbox() {
             style={{
               background: 'transparent', border: '1px solid rgba(255,255,255,0.12)',
               borderRadius: '8px', padding: '5px 12px', color: 'rgba(255,255,255,0.35)',
-              fontSize: '12px', cursor: 'pointer',
+              fontSize: '12px', cursor: 'pointer', whiteSpace: 'nowrap',
             }}
           >
             Sign out
           </button>
+        </div>
+        {/* Row 2: admin link (subtle) */}
+        <div style={{ marginBottom: '12px' }}>
+          <a href="/admin" style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', textDecoration: 'none' }}>Admin ↗</a>
         </div>
 
         {/* Filter tabs */}

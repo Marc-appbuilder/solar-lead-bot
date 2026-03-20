@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+const ADMIN_EMAILS = ['marcwrichards@gmail.com', 'marcwrichards@me.com'];
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -25,13 +27,19 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isProtected = pathname === '/' || pathname.startsWith('/dashboard') || pathname.startsWith('/admin');
-  const isLogin = pathname === '/login';
+  const isAdmin     = pathname.startsWith('/admin');
+  const isLogin     = pathname === '/login';
 
   if (!user && isProtected) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
   if (user && isLogin) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  // /admin is restricted to admin emails only
+  if (user && isAdmin && !ADMIN_EMAILS.includes(user.email?.toLowerCase() ?? '')) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

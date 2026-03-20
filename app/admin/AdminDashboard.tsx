@@ -181,11 +181,15 @@ export default function AdminDashboard() {
   if (view === 'list') return (
     <div style={page}>
       <div style={header}>
-        <span style={{ fontWeight: 700, fontSize: '20px' }}>Admin</span>
+        <div style={{ flex: 1 }}>
+          <span style={{ fontWeight: 700, fontSize: '20px' }}>Admin</span>
+          <div style={{ marginTop: '4px' }}>
+            <a href="/dashboard" style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', textDecoration: 'none' }}>← Dashboard</a>
+          </div>
+        </div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <a href="/dashboard" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>Dashboard ↗</a>
           <button onClick={signOut} style={ghostBtn}>Sign out</button>
-          <button style={goldBtn} onClick={() => setView('add')}>+ Add Client</button>
+          <button style={goldBtn} onClick={() => setView('add')}>+ Add</button>
         </div>
       </div>
 
