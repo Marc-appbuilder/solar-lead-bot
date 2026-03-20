@@ -16,17 +16,23 @@ export async function GET(request: NextRequest) {
         cookies: {
           getAll() { return cookieStore.getAll(); },
           setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
           },
         },
       }
     );
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
+
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      const response = NextResponse.redirect(`${origin}${next}`);
+      // Forward all cookies from the cookie store to the redirect response
+      cookieStore.getAll().forEach(({ name, value }) => {
+        response.cookies.set(name, value, { path: '/', sameSite: 'lax' });
+      });
+      return response;
     }
   }
 
