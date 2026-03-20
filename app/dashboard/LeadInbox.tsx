@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { createBrowserClient } from '@supabase/ssr';
 
 type Status = 'new' | 'contacted' | 'qualified' | 'dead';
@@ -51,33 +50,52 @@ function formatDate(iso: string): string {
 }
 
 export default function LeadInbox() {
-  const [leads, setLeads]     = useState<Lead[]>([]);
-  const [filter, setFilter]   = useState<Filter>('all');
+  const [leads, setLeads]       = useState<Lead[]>([]);
+  const [filter, setFilter]     = useState<Filter>('all');
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]   = useState(true);
+  const [agentId, setAgentId]   = useState<string | null>(null);
+  const [noAccount, setNoAccount] = useState(false);
 
-  const fetchLeads = useCallback(async () => {
-    const res = await fetch('/api/leads');
+  const fetchLeads = useCallback(async (aid: string) => {
+    const res = await fetch(`/api/leads?agentId=${encodeURIComponent(aid)}`);
     if (res.ok) setLeads(await res.json());
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    fetchLeads();
-
-    const client = createClient(
+    const supabase = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     );
 
-    const channel = client
-      .channel('leads-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
-        fetchLeads();
-      })
-      .subscribe();
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user?.email) return;
 
-    return () => { client.removeChannel(channel); };
+      // Find the client record matching this email
+      const res = await fetch('/api/clients');
+      if (!res.ok) return;
+      const clients: { agent_id: string; email: string | null }[] = await res.json();
+      const match = clients.find(c => c.email?.toLowerCase() === user.email!.toLowerCase());
+
+      if (!match) {
+        setNoAccount(true);
+        setLoading(false);
+        return;
+      }
+
+      setAgentId(match.agent_id);
+      fetchLeads(match.agent_id);
+
+      const channel = supabase
+        .channel('leads-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
+          fetchLeads(match.agent_id);
+        })
+        .subscribe();
+
+      return () => { supabase.removeChannel(channel); };
+    });
   }, [fetchLeads]);
 
   async function updateStatus(id: string, status: Status) {
@@ -91,6 +109,35 @@ export default function LeadInbox() {
 
   const filtered = filter === 'all' ? leads : leads.filter(l => l.status === filter);
   const newCount = leads.filter(l => l.status === 'new').length;
+
+  if (noAccount) return (
+    <div style={{
+      minHeight: '100dvh', background: '#0d0f14', display: 'flex',
+      flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      padding: '32px', textAlign: 'center',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    }}>
+      <div style={{ fontSize: '32px', marginBottom: '16px' }}>🔒</div>
+      <h2 style={{ color: '#e8eaf0', fontSize: '18px', fontWeight: 700, margin: '0 0 8px' }}>No account found</h2>
+      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px', lineHeight: 1.6, maxWidth: '300px', margin: '0 0 24px' }}>
+        Your email isn't linked to an estate agent account. Please contact support to get set up.
+      </p>
+      <button
+        onClick={async () => {
+          const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+          await sb.auth.signOut();
+          window.location.href = '/login';
+        }}
+        style={{
+          background: 'transparent', border: '1px solid rgba(255,255,255,0.15)',
+          borderRadius: '8px', padding: '8px 16px', color: 'rgba(255,255,255,0.4)',
+          fontSize: '13px', cursor: 'pointer',
+        }}
+      >
+        Sign out
+      </button>
+    </div>
+  );
 
   return (
     <div style={{
