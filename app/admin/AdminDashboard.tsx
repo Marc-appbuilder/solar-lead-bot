@@ -45,7 +45,7 @@ function timeAgo(iso: string): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-const EMBED_BASE = 'https://monty-widget.vercel.app';
+const EMBED_BASE = 'https://app.vaughanai.co';
 
 function embedSnippet(client: Client) {
   return `<script src="${EMBED_BASE}/embed.js" data-client="${client.agent_id}" data-color="${client.brand_color}"></script>`;
