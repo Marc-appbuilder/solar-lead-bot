@@ -42,10 +42,11 @@ const captureLeadTool: Anthropic.Tool = {
   input_schema: {
     type: 'object' as const,
     properties: {
-      name:    { type: 'string', description: 'Full name of the lead' },
-      email:   { type: 'string', description: 'Email address, or omit if not provided' },
-      phone:   { type: 'string', description: 'Phone number, or omit if not provided' },
-      summary: { type: 'string', description: 'One or two sentence summary of what they are looking for' },
+      name:         { type: 'string', description: 'Full name of the lead' },
+      email:        { type: 'string', description: 'Email address, or omit if not provided' },
+      phone:        { type: 'string', description: 'Phone number, or omit if not provided' },
+      enquiry_type: { type: 'string', enum: ['vendor', 'landlord', 'buyer', 'tenant', 'other'], description: 'Best classification of what the lead is looking to do' },
+      summary:      { type: 'string', description: 'One or two sentence summary of what they are looking for' },
     },
     required: ['name'],
   },
@@ -200,6 +201,7 @@ export async function POST(req: NextRequest) {
             name:             toolInput.name,
             email:            toolInput.email ?? null,
             phone:            toolInput.phone ?? null,
+            enquiry_type:     (toolInput as unknown as Record<string, unknown>).enquiry_type as string ?? null,
             notes:            toolInput.summary ?? null,
             raw_conversation: sanitisedMessages
               .map((m) => `${m.role}: ${m.content}`)

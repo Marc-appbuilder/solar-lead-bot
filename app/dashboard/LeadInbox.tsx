@@ -112,6 +112,7 @@ export default function LeadInbox() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
           <span style={{ fontWeight: 700, fontSize: '20px', flex: 1 }}>Lead Inbox</span>
+          <a href="/admin" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>Admin ↗</a>
           {newCount > 0 && (
             <span style={{
               background: '#b8882e', color: '#fff',

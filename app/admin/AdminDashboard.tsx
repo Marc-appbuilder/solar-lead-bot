@@ -182,7 +182,8 @@ export default function AdminDashboard() {
     <div style={page}>
       <div style={header}>
         <span style={{ fontWeight: 700, fontSize: '20px' }}>Admin</span>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <a href="/dashboard" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>Dashboard ↗</a>
           <button onClick={signOut} style={ghostBtn}>Sign out</button>
           <button style={goldBtn} onClick={() => setView('add')}>+ Add Client</button>
         </div>
