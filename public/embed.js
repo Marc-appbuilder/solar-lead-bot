@@ -2,7 +2,7 @@
  * Vaughan embed script
  *
  * Usage — paste before </body> on any page:
- *   <script src="https://your-domain.com/embed.js?clientId=demo" async></script>
+ *   <script src="https://app.vaughanai.co/embed.js?clientId=demo" async></script>
  *
  * Optional query params:
  *   clientId  — which agent config to load  (default: "demo")

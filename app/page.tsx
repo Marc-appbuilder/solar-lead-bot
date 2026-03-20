@@ -1,6 +1,6 @@
 import { clients } from '@/lib/clients';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://your-domain.com';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.vaughanai.co';
 
 export default function HomePage() {
   return (
