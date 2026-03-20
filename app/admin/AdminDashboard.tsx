@@ -51,9 +51,12 @@ function embedSnippet(client: Client) {
   return `<script src="${EMBED_BASE}/embed.js" data-client="${client.agent_id}" data-color="${client.brand_color}"></script>`;
 }
 
-const EMPTY_FORM = {
+const EMPTY_FORM: {
+  name: string; agent_id: string; contact_name: string; email: string;
+  phone: string; website: string; brand_color: string; status: 'active' | 'inactive';
+} = {
   name: '', agent_id: '', contact_name: '', email: '',
-  phone: '', website: '', brand_color: '#b8882e', status: 'active' as const,
+  phone: '', website: '', brand_color: '#b8882e', status: 'active',
 };
 
 export default function AdminDashboard() {
@@ -120,9 +123,6 @@ export default function AdminDashboard() {
     setCopied(client.id);
     setTimeout(() => setCopied(null), 2000);
   }
-
-  const s: React.CSSProperties & Record<string, unknown> = {};
-  void s;
 
   // ── Shared styles ──────────────────────────────────────────
   const page: React.CSSProperties = {
