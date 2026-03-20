@@ -1,6 +1,16 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { createBrowserClient } from '@supabase/ssr';
+
+async function signOut() {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  );
+  await supabase.auth.signOut();
+  window.location.href = '/login';
+}
 
 interface Client {
   id: string;
@@ -172,7 +182,10 @@ export default function AdminDashboard() {
     <div style={page}>
       <div style={header}>
         <span style={{ fontWeight: 700, fontSize: '20px' }}>Admin</span>
-        <button style={goldBtn} onClick={() => setView('add')}>+ Add Client</button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button onClick={signOut} style={ghostBtn}>Sign out</button>
+          <button style={goldBtn} onClick={() => setView('add')}>+ Add Client</button>
+        </div>
       </div>
 
       <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>

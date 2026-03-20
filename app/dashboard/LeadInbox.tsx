@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 
 type Status = 'new' | 'contacted' | 'qualified' | 'dead';
 type Filter = 'all' | Status;
@@ -110,7 +111,7 @@ export default function LeadInbox() {
         zIndex: 10,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-          <span style={{ fontWeight: 700, fontSize: '20px' }}>Lead Inbox</span>
+          <span style={{ fontWeight: 700, fontSize: '20px', flex: 1 }}>Lead Inbox</span>
           {newCount > 0 && (
             <span style={{
               background: '#b8882e', color: '#fff',
@@ -120,6 +121,23 @@ export default function LeadInbox() {
               {newCount} new
             </span>
           )}
+          <button
+            onClick={async () => {
+              const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+              );
+              await supabase.auth.signOut();
+              window.location.href = '/login';
+            }}
+            style={{
+              background: 'transparent', border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '8px', padding: '5px 12px', color: 'rgba(255,255,255,0.35)',
+              fontSize: '12px', cursor: 'pointer',
+            }}
+          >
+            Sign out
+          </button>
         </div>
 
         {/* Filter tabs */}
