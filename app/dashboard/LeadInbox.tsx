@@ -57,8 +57,11 @@ export default function LeadInbox() {
   const [agentId, setAgentId]   = useState<string | null>(null);
   const [noAccount, setNoAccount] = useState(false);
 
-  const fetchLeads = useCallback(async (aid: string) => {
-    const res = await fetch(`/api/leads?agentId=${encodeURIComponent(aid)}`);
+  const ADMIN_EMAILS = ['marcwrichards@gmail.com', 'marcwrichards@me.com'];
+
+  const fetchLeads = useCallback(async (aid?: string) => {
+    const url = aid ? `/api/leads?agentId=${encodeURIComponent(aid)}` : '/api/leads';
+    const res = await fetch(url);
     if (res.ok) setLeads(await res.json());
     setLoading(false);
   }, []);
@@ -72,7 +75,17 @@ export default function LeadInbox() {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user?.email) return;
 
-      // Find the client record matching this email
+      // Admin emails see all leads
+      if (ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+        fetchLeads();
+        const channel = supabase
+          .channel('leads-realtime')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => fetchLeads())
+          .subscribe();
+        return () => { supabase.removeChannel(channel); };
+      }
+
+      // Everyone else: find matching client by email
       const res = await fetch('/api/clients');
       if (!res.ok) return;
       const clients: { agent_id: string; email: string | null }[] = await res.json();
@@ -89,9 +102,7 @@ export default function LeadInbox() {
 
       const channel = supabase
         .channel('leads-realtime')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
-          fetchLeads(match.agent_id);
-        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => fetchLeads(match.agent_id))
         .subscribe();
 
       return () => { supabase.removeChannel(channel); };
