@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 import { getClient } from '@/lib/clients';
 import { Resend } from 'resend';
+import { supabase } from '@/lib/supabase';
 import type { LeadPayload } from '@/app/api/lead/route';
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -191,9 +192,21 @@ export async function POST(req: NextRequest) {
           console.error('[chat] failed to parse tool input:', toolRawInput);
         }
 
-        // Fire email as long as we have name + at least one contact method
+        // Fire email and save to Supabase as long as we have name + at least one contact method
         if (toolInput.name && (toolInput.email || toolInput.phone)) {
           sendLeadEmail(toolInput, clientId).catch(console.error);
+          supabase.from('leads').insert({
+            agent_id:         clientId,
+            name:             toolInput.name,
+            email:            toolInput.email ?? null,
+            phone:            toolInput.phone ?? null,
+            notes:            toolInput.summary ?? null,
+            raw_conversation: sanitisedMessages
+              .map((m) => `${m.role}: ${m.content}`)
+              .join('\n'),
+          }).then(({ error }) => {
+            if (error) console.error('[lead] supabase insert error:', error);
+          });
         }
 
         /* ── Second pass: give Claude the tool result ── */
