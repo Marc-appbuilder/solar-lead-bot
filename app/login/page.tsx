@@ -47,14 +47,20 @@ export default function LoginPage() {
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       WebkitFontSmoothing: 'antialiased',
     }}>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&display=swap"
+        rel="stylesheet"
+      />
 
       {/* Logo / wordmark */}
       <div style={{ marginBottom: '40px', textAlign: 'center' }}>
         <div style={{
-          fontSize: '32px',
-          fontWeight: 800,
-          letterSpacing: '-0.5px',
+          fontFamily: '"Cormorant Garamond", serif',
+          fontSize: '42px',
+          fontWeight: 700,
+          letterSpacing: '0.02em',
           color: '#f8f3ea',
+          lineHeight: 1,
         }}>
           Vaughan<span style={{ color: '#b8882e' }}>AI</span>
         </div>
