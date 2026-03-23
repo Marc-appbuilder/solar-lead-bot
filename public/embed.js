@@ -267,13 +267,13 @@
       /* Colour supplied inline — apply immediately, no teaser (no config fetch) */
       applyColor(colorArg);
     } else {
-      /* Fetch brand colour + teaser text from server */
-      fetch(origin + '/api/config?clientId=' + encodeURIComponent(clientId))
+      /* Fetch config from server */
+      fetch(origin + '/api/client-config/' + encodeURIComponent(clientId))
         .then(function (r) { return r.json(); })
         .then(function (d) {
           var colour = d.brandColour || '#1a365d';
           applyColor(colour);
-          teaserEl.style.borderColor = colour;
+          teaserEl.style.borderColor = d.borderColour || colour;
           if (d.teaserText) {
             teaserEl.textContent    = d.teaserText;
             teaserEl.style.display  = 'block';
