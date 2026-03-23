@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 
 const supabase = createBrowserClient(
@@ -13,6 +13,13 @@ export default function LoginPage() {
   const [sent, setSent]       = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error') === 'auth') {
+      setError('For security reasons, please open this link in the same browser you requested it from, then try again.');
+    }
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
