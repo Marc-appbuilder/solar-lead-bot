@@ -67,22 +67,6 @@
   function applyFabPosition(pos) {
     _pos = pos || 'bottom-right';
 
-    /* Restore a previously dragged position from localStorage */
-    try {
-      var saved = localStorage.getItem('__vaughan_fab_' + clientId);
-      if (saved && !isMobile()) {
-        var p = JSON.parse(saved);
-        var c = _clampFab(p.x, p.y);
-        Object.assign(fabWrap.style, {
-          bottom: 'auto', right: 'auto',
-          left: c[0] + 'px', top: c[1] + 'px',
-          animation: 'none',
-        });
-        _dragged = true;
-        return;
-      }
-    } catch (_) {}
-
     var isLeft    = _pos.indexOf('left')  !== -1;
     var isFloated = _pos === 'middle-left'  || _pos === 'middle-right' ||
                     _pos === 'lower-left'   || _pos === 'lower-right';
@@ -98,6 +82,22 @@
       left:   isLeft    ? '24px'  : 'auto',
       animation: anim + ' 0.6s cubic-bezier(0.22,1,0.36,1) 2s both',
     });
+
+    /* Apply any drag offset saved this session (overrides admin position,
+       but only until the user closes the tab / clears the session) */
+    try {
+      var saved = sessionStorage.getItem('__vaughan_fab_' + clientId);
+      if (saved && !isMobile()) {
+        var p = JSON.parse(saved);
+        var c = _clampFab(p.x, p.y);
+        Object.assign(fabWrap.style, {
+          bottom: 'auto', right: 'auto',
+          left: c[0] + 'px', top: c[1] + 'px',
+          animation: 'none',
+        });
+        _dragged = true;
+      }
+    } catch (_) {}
   }
 
   /* ── Drag (desktop only) ─────────────────────────────────────────────── */
@@ -167,7 +167,7 @@
         _justDragged = true;
         try {
           var rect2 = fabWrap.getBoundingClientRect();
-          localStorage.setItem('__vaughan_fab_' + clientId,
+          sessionStorage.setItem('__vaughan_fab_' + clientId,
             JSON.stringify({ x: rect2.left, y: rect2.top }));
         } catch (_) {}
       }
@@ -186,7 +186,7 @@
       fabWrap.style.left = c[0] + 'px';
       fabWrap.style.top  = c[1] + 'px';
     }
-    if (isOpen) _dragged && !isMobile() ? _repoContainer() : applyContainerSize();
+    if (isOpen) { if (_dragged && !isMobile()) { _repoContainer(); } else { applyContainerSize(); } }
   });
 
   /* Radar ring */
