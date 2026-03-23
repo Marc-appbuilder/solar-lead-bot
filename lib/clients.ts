@@ -184,7 +184,7 @@ Always try to collect name, email and phone number. If the user declines one, mo
     agentEmail: 'marcwrichards@gmail.com',
     notificationEmail: 'marcwrichards@gmail.com',
     brandColour: '#1c1c1c',
-    teaserText: 'Thinking of selling or letting?',
+    teaserText: 'Chat to us',
   },
 
   'vaughanai': {
