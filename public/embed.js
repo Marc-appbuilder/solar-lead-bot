@@ -48,8 +48,8 @@
     '@keyframes ea-fab-eml{from{opacity:0;transform:translateX(-110px) translateY(-50%)}to{opacity:1;transform:translateX(0) translateY(-50%)}}' +
     /* Gentle breathing glow */
     '@keyframes ea-breathe{0%,100%{box-shadow:var(--ea-glow-rest)}50%{box-shadow:var(--ea-glow-peak)}}' +
-    /* Live dot pulse */
-    '@keyframes ea-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(0.7);opacity:0.5}}';
+    /* Radar / sonar pulse — emanates from circle outward */
+    '@keyframes ea-pulse{0%{transform:scale(1);opacity:0.7}100%{transform:scale(2.6);opacity:0}}';
   document.head.appendChild(styleEl);
 
   /* ── 5. FAB wrapper ─────────────────────────────────────────────────────── */
@@ -116,26 +116,8 @@
   fab.addEventListener('mouseover', function () { fab.style.transform = 'scale(1.1)'; });
   fab.addEventListener('mouseout',  function () { fab.style.transform = 'scale(1)'; });
 
-  /* Live dot — gold, top-right corner of the circle */
-  var liveDot = document.createElement('span');
-  Object.assign(liveDot.style, {
-    position:     'absolute',
-    top:          '2px',
-    right:        '2px',
-    width:        '12px',
-    height:       '12px',
-    borderRadius: '50%',
-    background:   '#c9a84c',
-    border:       '2px solid #ffffff',
-    boxSizing:    'border-box',
-    animation:    'ea-dot 2.4s ease-in-out 2.6s infinite',
-    zIndex:       '1',
-    pointerEvents:'none',
-  });
-
   fabWrap.appendChild(radar);
   fabWrap.appendChild(fab);
-  fabWrap.appendChild(liveDot);
 
   /* ── 6. Widget container ─────────────────────────────────────────────────── */
   var container = document.createElement('div');
@@ -204,7 +186,7 @@
     container.style.animation = 'ea-widget-in 0.28s cubic-bezier(0.22,1,0.36,1) both';
     overlay.style.display     = isMobile() ? 'none' : 'block';
     fabWrap.style.display     = isMobile() ? 'none' : 'flex';
-    liveDot.style.display     = 'none';
+    radar.style.animationPlayState = 'paused';
     fab.innerHTML = closeInner;
     fab.setAttribute('aria-label', 'Close chat');
   }
@@ -214,7 +196,7 @@
     container.style.display = 'none';
     overlay.style.display   = 'none';
     fabWrap.style.display   = 'flex';
-    liveDot.style.display   = 'block';
+    radar.style.animationPlayState = 'running';
     fab.innerHTML = _chatInner;
     fab.setAttribute('aria-label', 'Open chat');
   }
@@ -223,8 +205,9 @@
   function applyColor(hex) {
     var rgb = hexRgb(hex);
 
-    /* Radar ring */
-    radar.style.borderColor = 'rgba(' + rgb + ',0.5)';
+    /* Radar pulse ring — expands outward from circle using brand colour */
+    radar.style.borderColor = 'rgba(' + rgb + ',0.55)';
+    radar.style.animation   = 'ea-pulse 3s ease-out 2.8s infinite';
 
     /* FAB background */
     fab.style.background = 'linear-gradient(135deg, ' + hex + ' 0%, rgba(' + rgb + ',0.82) 100%)';
