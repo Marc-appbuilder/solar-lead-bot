@@ -48,27 +48,28 @@
     '@keyframes ea-radar{0%{transform:scale(1);opacity:0.85}100%{transform:scale(2.8);opacity:0}}';
   document.head.appendChild(style);
 
-  /* Teaser label (shown above FAB when set, hidden when chat opens) */
+  /* Teaser button (shown beside/above FAB when teaserText is set) */
   var teaserEl = document.createElement('div');
   Object.assign(teaserEl.style, {
     position:      'fixed',
-    bottom:        '100px',
-    right:         '24px',
     zIndex:        '2147483647',
-    background:    'rgba(255,255,255,0.85)',
-    color:         '#3a3a3a',
+    background:    '#3a3a3a',
+    color:         '#ffffff',
     fontSize:      '13px',
     fontWeight:    '600',
-    letterSpacing: '0.01em',
+    letterSpacing: '0.02em',
     fontFamily:    '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    padding:       '10px 22px',
-    borderRadius:  '999px',
-    border:        '2px solid rgba(0,0,0,0.10)',
+    padding:       '10px 18px 10px 14px',
+    borderRadius:  '14px',
+    border:        'none',
     outline:       'none',
-    boxShadow:     '0 4px 12px rgba(0,0,0,0.15)',
+    boxShadow:     '0 4px 16px rgba(0,0,0,0.25), 0 1px 4px rgba(0,0,0,0.15)',
     whiteSpace:    'nowrap',
-    pointerEvents: 'none',
+    pointerEvents: 'auto',
+    cursor:        'pointer',
     display:       'none',
+    alignItems:    'center',
+    gap:           '8px',
     animation:     'ea-pop-in 0.35s cubic-bezier(0.34,1.4,0.64,1) 1.2s both',
   });
 
@@ -76,8 +77,6 @@
   var fabWrap = document.createElement('div');
   Object.assign(fabWrap.style, {
     position:   'fixed',
-    bottom:     '24px',
-    right:      '24px',
     zIndex:     '2147483647',
     width:      '64px',
     height:     '64px',
@@ -135,14 +134,41 @@
         width: '100vw', height: '100dvh',
         maxWidth: '100vw', maxHeight: '100dvh',
         borderRadius: '0', boxShadow: 'none',
+        transform: 'none',
       });
     } else {
       Object.assign(container.style, {
-        top: 'auto', left: 'auto',
-        bottom: '96px', right: '16px',
+        top: 'calc(50% - 290px)', left: 'auto',
+        bottom: 'auto', right: '96px',
         width: '380px', height: '580px',
-        maxWidth: 'calc(100vw - 24px)', maxHeight: 'calc(100vh - 120px)',
+        maxWidth: 'calc(100vw - 130px)', maxHeight: 'calc(100vh - 40px)',
         borderRadius: '16px', boxShadow: '0 12px 48px rgba(0,0,0,0.28)',
+        transform: 'none',
+      });
+    }
+  }
+
+  /* Responsive FAB + teaser positioning */
+  function applyFabPosition() {
+    if (isMobile()) {
+      Object.assign(fabWrap.style, {
+        bottom: '80px', right: '24px',
+        top: 'auto', transform: 'none',
+      });
+      Object.assign(teaserEl.style, {
+        bottom: '156px', right: '24px',
+        top: 'auto', transform: 'none',
+        flexDirection: 'row',
+      });
+    } else {
+      Object.assign(fabWrap.style, {
+        top: '50%', right: '20px',
+        bottom: 'auto', transform: 'translateY(-50%)',
+      });
+      Object.assign(teaserEl.style, {
+        top: '50%', right: '96px',
+        bottom: 'auto', transform: 'translateY(-50%)',
+        flexDirection: 'row',
       });
     }
   }
@@ -155,7 +181,11 @@
     transformOrigin: 'bottom right',
   });
   applyContainerSize();
-  window.addEventListener('resize', function () { if (isOpen) applyContainerSize(); });
+  applyFabPosition();
+  window.addEventListener('resize', function () {
+    applyFabPosition();
+    if (isOpen) applyContainerSize();
+  });
 
   var iframe = document.createElement('iframe');
   iframe.src = origin + '/widget?clientId=' + encodeURIComponent(clientId);
@@ -171,7 +201,7 @@
     isOpen = false;
     container.style.display = 'none';
     overlay.style.display   = 'none';
-    if (teaserEl.textContent) teaserEl.style.display = 'block';
+    if (teaserEl._hasText) teaserEl.style.display = 'flex';
   });
 
   /* ── 5. Apply brand colour (called once colour is resolved) ─────────────── */
@@ -179,6 +209,28 @@
     '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">' +
       '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>' +
     '</svg>';
+
+  function openChat() {
+    isOpen = true;
+    applyContainerSize();
+    container.style.display   = 'block';
+    container.style.animation = 'ea-widget-in 0.28s cubic-bezier(0.22,1,0.36,1) both';
+    overlay.style.display     = isMobile() ? 'none' : 'block';
+    fabWrap.style.display     = isMobile() ? 'none' : 'flex';
+    teaserEl.style.display    = 'none';
+    fab.innerHTML = closeInner;
+    fab.setAttribute('aria-label', 'Close chat');
+  }
+
+  function closeChat(chatInner) {
+    isOpen = false;
+    container.style.display  = 'none';
+    overlay.style.display    = 'none';
+    fabWrap.style.display    = 'flex';
+    if (teaserEl._hasText) teaserEl.style.display = 'flex';
+    fab.innerHTML = chatInner;
+    fab.setAttribute('aria-label', 'Open chat');
+  }
 
   function applyColor(hex) {
     var rgb = hexRgb(hex);
@@ -211,26 +263,13 @@
     /* Re-wire toggle with correct chatInner */
     fab.onclick = null;
     fab.addEventListener('click', function () {
-      if (isOpen) {
-        isOpen = false;
-        container.style.display  = 'none';
-        overlay.style.display    = 'none';
-        fabWrap.style.display    = 'flex';
-        if (teaserEl.textContent) teaserEl.style.display = 'block';
-        fab.innerHTML = chatInner;
-        fab.setAttribute('aria-label', 'Open chat');
-      } else {
-        isOpen = true;
-        applyContainerSize();
-        container.style.display   = 'block';
-        container.style.animation = 'ea-widget-in 0.28s cubic-bezier(0.22,1,0.36,1) both';
-        overlay.style.display     = isMobile() ? 'none' : 'block';
-        /* Hide FAB on mobile — it sits over the send button */
-        fabWrap.style.display     = isMobile() ? 'none' : 'flex';
-        teaserEl.style.display    = 'none';
-        fab.innerHTML = closeInner;
-        fab.setAttribute('aria-label', 'Close chat');
-      }
+      if (isOpen) { closeChat(chatInner); } else { openChat(); }
+    });
+
+    /* Wire teaser button to open chat too */
+    teaserEl.onclick = null;
+    teaserEl.addEventListener('click', function () {
+      if (!isOpen) openChat();
     });
   }
 
@@ -243,7 +282,7 @@
       container.style.display = 'none';
       overlay.style.display   = 'none';
       fabWrap.style.display   = 'flex';
-      if (teaserEl.textContent) teaserEl.style.display = 'block';
+      if (teaserEl._hasText) teaserEl.style.display = 'flex';
     }
   });
 
@@ -253,11 +292,16 @@
       container.style.display = 'none';
       overlay.style.display   = 'none';
       fabWrap.style.display   = 'flex';
-      if (teaserEl.textContent) teaserEl.style.display = 'block';
+      if (teaserEl._hasText) teaserEl.style.display = 'flex';
     }
   });
 
   /* ── 7. Mount then resolve colour ───────────────────────────────────────── */
+  var chatIconSvg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:0.85">' +
+      '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' +
+    '</svg>';
+
   function mount() {
     document.body.appendChild(overlay);
     document.body.appendChild(container);
@@ -274,9 +318,10 @@
         .then(function (d) {
           var colour = d.brandColour || '#1a365d';
           applyColor(colour);
-                if (d.teaserText) {
-            teaserEl.textContent    = d.teaserText;
-            teaserEl.style.display  = 'block';
+          if (d.teaserText) {
+            teaserEl._hasText = true;
+            teaserEl.innerHTML = chatIconSvg + '<span>' + d.teaserText + '</span>';
+            teaserEl.style.display = 'flex';
           }
         })
         .catch(function () { applyColor('#1a365d'); });
