@@ -64,9 +64,8 @@
     padding:       '8px 16px',
     borderRadius:  '999px',
     border:        'none',
-    outline:       '1.5px solid transparent',
-    outlineOffset: '0px',
-    boxShadow:     '0 2px 12px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.08)',
+    outline:       'none',
+    boxShadow:     '0 4px 20px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.10)',
     whiteSpace:    'nowrap',
     pointerEvents: 'none',
     display:       'none',
@@ -275,8 +274,7 @@
         .then(function (d) {
           var colour = d.brandColour || '#1a365d';
           applyColor(colour);
-          teaserEl.style.outlineColor = d.borderColour || colour;
-          if (d.teaserText) {
+                if (d.teaserText) {
             teaserEl.textContent    = d.teaserText;
             teaserEl.style.display  = 'block';
           }
