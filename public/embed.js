@@ -66,17 +66,19 @@
 
   function applyFabPosition(pos) {
     _pos = pos || 'bottom-right';
-    var isLeft = _pos === 'bottom-left' || _pos === 'middle-left';
-    var isMid  = _pos === 'middle-left' || _pos === 'middle-right';
-    var anim   = isMid
+    var isLeft    = _pos.indexOf('left')  !== -1;
+    var isFloated = _pos === 'middle-left'  || _pos === 'middle-right' ||
+                    _pos === 'lower-left'   || _pos === 'lower-right';
+    var topVal    = _pos === 'lower-left'   || _pos === 'lower-right' ? '72%' : '50%';
+    var anim      = isFloated
       ? (isLeft ? 'ea-fab-eml' : 'ea-fab-emr')
       : (isLeft ? 'ea-fab-el'  : 'ea-fab-er');
 
     Object.assign(fabWrap.style, {
-      bottom:    isMid ? 'auto'  : '24px',
-      top:       isMid ? '50%'   : 'auto',
-      right:     isLeft ? 'auto' : '24px',
-      left:      isLeft ? '24px' : 'auto',
+      bottom: isFloated ? 'auto'  : '24px',
+      top:    isFloated ? topVal  : 'auto',
+      right:  isLeft    ? 'auto'  : '24px',
+      left:   isLeft    ? '24px'  : 'auto',
       animation: anim + ' 0.6s cubic-bezier(0.22,1,0.36,1) 2s both',
     });
   }
@@ -129,23 +131,27 @@
   function applyContainerSize() {
     if (isMobile()) {
       Object.assign(container.style, {
-        top: '0', left: '0', bottom: 'auto', right: 'auto',
-        width: '100vw', height: '100dvh',
-        maxWidth: '100vw', maxHeight: '100dvh',
-        borderRadius: '0', boxShadow: 'none',
+        top: '55%', right: '12px', bottom: 'auto', left: 'auto',
+        width: 'calc(100vw - 24px)', height: '60dvh',
+        maxWidth: '420px', maxHeight: '70dvh',
+        borderRadius: '16px', boxShadow: '0 12px 48px rgba(0,0,0,0.32)',
+        transform: 'translateY(-50%)',
       });
     } else {
-      var isLeft = _pos === 'bottom-left' || _pos === 'middle-left';
-      var isMid  = _pos === 'middle-left' || _pos === 'middle-right';
+      var isLeft    = _pos.indexOf('left') !== -1;
+      var isFloated = _pos === 'middle-left' || _pos === 'middle-right' ||
+                      _pos === 'lower-left'  || _pos === 'lower-right';
+      var topVal    = _pos === 'lower-left' || _pos === 'lower-right'
+        ? 'calc(72% - 290px)' : 'calc(50% - 290px)';
       Object.assign(container.style, {
-        right:     isLeft ? 'auto'  : '96px',
-        left:      isLeft ? '96px'  : 'auto',
-        bottom:    isMid  ? 'auto'  : '96px',
-        top:       isMid  ? 'calc(50% - 290px)' : 'auto',
+        right:     isLeft    ? 'auto'  : '96px',
+        left:      isLeft    ? '96px'  : 'auto',
+        bottom:    isFloated ? 'auto'  : '96px',
+        top:       isFloated ? topVal  : 'auto',
         width:     '380px',
         height:    '580px',
-        maxWidth:  isLeft ? 'calc(100vw - 110px)' : 'calc(100vw - 110px)',
-        maxHeight: isMid  ? 'calc(100vh - 40px)'  : 'calc(100vh - 120px)',
+        maxWidth:  'calc(100vw - 110px)',
+        maxHeight: isFloated ? 'calc(100vh - 40px)' : 'calc(100vh - 120px)',
         borderRadius: '16px',
         boxShadow: '0 12px 48px rgba(0,0,0,0.28)',
       });
@@ -184,8 +190,8 @@
     applyContainerSize();
     container.style.display   = 'block';
     container.style.animation = 'ea-widget-in 0.28s cubic-bezier(0.22,1,0.36,1) both';
-    overlay.style.display     = isMobile() ? 'none' : 'block';
-    fabWrap.style.display     = isMobile() ? 'none' : 'flex';
+    overlay.style.display     = isMobile() ? 'block' : 'block';
+    fabWrap.style.display     = 'flex';
     radar.style.animationPlayState = 'paused';
     fab.innerHTML = closeInner;
     fab.setAttribute('aria-label', 'Close chat');

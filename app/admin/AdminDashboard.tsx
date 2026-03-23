@@ -555,6 +555,8 @@ export default function AdminDashboard() {
               {([
                 { val: 'bottom-left',  label: '↙ Bottom left'  },
                 { val: 'bottom-right', label: '↘ Bottom right' },
+                { val: 'lower-left',   label: '↖ Lower left'   },
+                { val: 'lower-right',  label: '↗ Lower right'  },
                 { val: 'middle-left',  label: '← Middle left'  },
                 { val: 'middle-right', label: '→ Middle right' },
               ] as { val: string; label: string }[]).map(opt => (
