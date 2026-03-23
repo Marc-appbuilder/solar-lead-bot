@@ -84,6 +84,9 @@ export default function AdminDashboard() {
   const [teaserDraft, setTeaserDraft]   = useState<string>('');
   const [teaserSaving, setTeaserSaving] = useState(false);
   const [teaserSaved, setTeaserSaved]   = useState(false);
+  const [colorDraft, setColorDraft]     = useState<string>('');
+  const [colorSaving, setColorSaving]   = useState(false);
+  const [colorSaved, setColorSaved]     = useState(false);
 
   const fetchClients = useCallback(async () => {
     const res = await fetch('/api/clients');
@@ -100,12 +103,27 @@ export default function AdminDashboard() {
     setExpandedLead(null);
     setTeaserDraft(client.teaser_text ?? '');
     setTeaserSaved(false);
+    setColorDraft(client.brand_color ?? '');
+    setColorSaved(false);
     const res = await fetch(`/api/clients/${client.id}`);
     if (res.ok) {
       const data = await res.json();
       setLeads(data.leads);
     }
     setDetailLoading(false);
+  }
+
+  async function saveColor(clientId: string) {
+    setColorSaving(true);
+    await fetch(`/api/clients/${clientId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ brand_color: colorDraft }),
+    });
+    setColorSaving(false);
+    setColorSaved(true);
+    setClients(prev => prev.map(c => c.id === clientId ? { ...c, brand_color: colorDraft } : c));
+    setTimeout(() => setColorSaved(false), 2000);
   }
 
   async function saveTeaser(clientId: string) {
@@ -422,6 +440,37 @@ export default function AdminDashboard() {
               }}
             >
               {copied === selected.id ? '✓ Copied!' : '⟨/⟩ Copy embed code'}
+            </button>
+          </div>
+
+          {/* Brand colour */}
+          <div style={{ ...card, padding: '14px 16px' }}>
+            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '8px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              Brand colour
+            </div>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
+              <input
+                type="color"
+                value={colorDraft}
+                onChange={e => setColorDraft(e.target.value)}
+                style={{ width: '40px', height: '40px', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'none', padding: 0 }}
+              />
+              <input
+                style={{ ...input, flex: 1 }}
+                placeholder="#1c1c1c"
+                value={colorDraft}
+                onChange={e => setColorDraft(e.target.value)}
+              />
+            </div>
+            <button
+              onClick={() => saveColor(selected.id)}
+              disabled={colorSaving}
+              style={{
+                ...ghostBtn, width: '100%',
+                color: colorSaved ? '#34d399' : 'rgba(255,255,255,0.6)',
+              }}
+            >
+              {colorSaving ? 'Saving…' : colorSaved ? '✓ Saved' : 'Save colour'}
             </button>
           </div>
 
