@@ -59,7 +59,7 @@ function timeAgo(iso: string): string {
 const EMBED_BASE = 'https://app.vaughanai.co';
 
 function embedSnippet(client: Client) {
-  return `<script src="${EMBED_BASE}/embed.js" data-client="${client.agent_id}" data-color="${client.brand_color}"></script>`;
+  return `<script src="${EMBED_BASE}/embed.js?clientId=${client.agent_id}" async></script>`;
 }
 
 const EMPTY_FORM: {
