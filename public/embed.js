@@ -55,7 +55,7 @@
     bottom:        '100px',
     right:         '24px',
     zIndex:        '2147483647',
-    background:    '#ffffff',
+    background:    'rgba(255,255,255,0.85)',
     color:         '#3a3a3a',
     fontSize:      '13px',
     fontWeight:    '500',
@@ -63,7 +63,7 @@
     fontFamily:    '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     padding:       '8px 16px',
     borderRadius:  '999px',
-    border:        '1px solid rgba(0,0,0,0.09)',
+    border:        '1px solid transparent',
     boxShadow:     '0 2px 8px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06)',
     whiteSpace:    'nowrap',
     pointerEvents: 'none',
@@ -271,7 +271,9 @@
       fetch(origin + '/api/config?clientId=' + encodeURIComponent(clientId))
         .then(function (r) { return r.json(); })
         .then(function (d) {
-          applyColor(d.brandColour || '#1a365d');
+          var colour = d.brandColour || '#1a365d';
+          applyColor(colour);
+          teaserEl.style.borderColor = colour;
           if (d.teaserText) {
             teaserEl.textContent    = d.teaserText;
             teaserEl.style.display  = 'block';
