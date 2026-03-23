@@ -4,14 +4,9 @@
  * Usage — paste before </body> on any page:
  *   <script src="https://app.vaughanai.co/embed.js?clientId=demo" async></script>
  *
- * Optional query params:
- *   clientId  — which agent config to load  (default: "demo")
- *   color     — override brand hex color    (auto-fetched from server if omitted)
- *
  * Modes:
- *   Unified button — when teaserText is set: single charcoal pill (icon + text)
- *                    replaces the circular FAB entirely.
- *   Standard FAB   — when no teaserText: regular circular chat button.
+ *   Unified button — when teaserText is set: premium pill (white bg, brand colour)
+ *   Standard FAB   — when no teaserText: circular chat button
  */
 (function () {
   'use strict';
@@ -43,48 +38,55 @@
   function isMobile() { return window.innerWidth <= 768; }
 
   /* ── 4. Keyframes ───────────────────────────────────────────────────────── */
-  var style = document.createElement('style');
-  style.textContent =
+  var styleEl = document.createElement('style');
+  styleEl.textContent =
+    /* Standard FAB animations */
     '@keyframes ea-pop-in{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}' +
     '@keyframes ea-widget-in{from{opacity:0;transform:translateY(16px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}' +
-    '@keyframes ea-radar{0%{transform:scale(1);opacity:0.85}100%{transform:scale(2.8);opacity:0}}';
-  document.head.appendChild(style);
+    '@keyframes ea-radar{0%{transform:scale(1);opacity:0.85}100%{transform:scale(2.8);opacity:0}}' +
+    /* Unified pill: slide in from right */
+    '@keyframes ea-slide-in{from{opacity:0;transform:translateY(-50%) translateX(110%)}to{opacity:1;transform:translateY(-50%) translateX(0)}}' +
+    '@keyframes ea-slide-in-mob{from{opacity:0;transform:translateX(110%)}to{opacity:1;transform:translateX(0)}}' +
+    /* Gentle breathing glow — colour injected via JS */
+    '@keyframes ea-breathe{0%,100%{box-shadow:var(--ea-shadow-rest)}50%{box-shadow:var(--ea-shadow-glow)}}' +
+    /* Live dot pulse */
+    '@keyframes ea-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(0.75);opacity:0.55}}';
+  document.head.appendChild(styleEl);
 
-  /* ── 5. Unified launcher button (used when teaserText is set) ───────────── */
+  /* ── 5. Unified launcher pill ───────────────────────────────────────────── */
   var launcher = document.createElement('button');
   launcher.setAttribute('aria-label', 'Open chat');
   Object.assign(launcher.style, {
     position:      'fixed',
     zIndex:        '2147483647',
-    background:    '#3a3a3a',
-    color:         '#ffffff',
-    fontSize:      '14px',
-    fontWeight:    '600',
-    letterSpacing: '0.01em',
-    fontFamily:    '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    padding:       '12px 20px 12px 16px',
-    borderRadius:  '14px',
+    background:    '#ffffff',
     border:        'none',
     outline:       'none',
-    boxShadow:     '0 4px 20px rgba(0,0,0,0.28), 0 1px 6px rgba(0,0,0,0.15)',
-    whiteSpace:    'nowrap',
+    borderRadius:  '999px',
+    padding:       '11px 20px 11px 15px',
     cursor:        'pointer',
     display:       'none',
     alignItems:    'center',
-    gap:           '9px',
-    transition:    'transform 0.15s ease, box-shadow 0.15s ease',
-    animation:     'ea-pop-in 0.4s cubic-bezier(0.34,1.4,0.64,1) 0.8s both',
+    gap:           '10px',
+    whiteSpace:    'nowrap',
+    transition:    'transform 0.18s ease',
   });
-  launcher.addEventListener('mouseover', function () {
-    launcher.style.transform  = 'scale(1.04)';
-    launcher.style.boxShadow  = '0 6px 28px rgba(0,0,0,0.35), 0 1px 6px rgba(0,0,0,0.15)';
-  });
-  launcher.addEventListener('mouseout', function () {
-    launcher.style.transform  = 'scale(1)';
-    launcher.style.boxShadow  = '0 4px 20px rgba(0,0,0,0.28), 0 1px 6px rgba(0,0,0,0.15)';
+  launcher.addEventListener('mouseover', function () { launcher.style.transform = isMobile() ? 'scale(1.03)' : 'translateY(-50%) scale(1.03)'; });
+  launcher.addEventListener('mouseout',  function () { launcher.style.transform = isMobile() ? 'scale(1)'    : 'translateY(-50%)'; });
+
+  /* Live availability dot */
+  var liveDot = document.createElement('span');
+  Object.assign(liveDot.style, {
+    display:      'inline-block',
+    width:        '8px',
+    height:       '8px',
+    borderRadius: '50%',
+    background:   '#c9a84c',
+    flexShrink:   '0',
+    animation:    'ea-dot 2.2s ease-in-out infinite',
   });
 
-  /* ── 6. Standard circular FAB (used when no teaserText) ─────────────────── */
+  /* ── 6. Standard circular FAB ───────────────────────────────────────────── */
   var fabWrap = document.createElement('div');
   Object.assign(fabWrap.style, {
     position: 'fixed', bottom: '24px', right: '24px',
@@ -128,12 +130,11 @@
   Object.assign(iframe.style, { width: '100%', height: '100%', border: 'none', display: 'block' });
   container.appendChild(iframe);
 
-  /* Overlay (desktop click-outside to close) */
   var overlay = document.createElement('div');
   Object.assign(overlay.style, { position: 'fixed', inset: '0', zIndex: '2147483645', display: 'none' });
 
   /* ── 8. Sizing / positioning ─────────────────────────────────────────────── */
-  var unifiedMode = false; // set true once we know teaserText is configured
+  var unifiedMode = false;
 
   function applyContainerSize() {
     if (isMobile()) {
@@ -144,7 +145,6 @@
         borderRadius: '0', boxShadow: 'none', transform: 'none',
       });
     } else if (unifiedMode) {
-      /* Unified: open to the left of the launcher pill */
       Object.assign(container.style, {
         top: 'calc(65% - 290px)', right: '195px', bottom: 'auto', left: 'auto',
         width: '380px', height: '580px',
@@ -152,7 +152,6 @@
         borderRadius: '16px', boxShadow: '0 12px 48px rgba(0,0,0,0.28)', transform: 'none',
       });
     } else {
-      /* Standard: open above the FAB */
       Object.assign(container.style, {
         top: 'auto', left: 'auto', bottom: '96px', right: '16px',
         width: '380px', height: '580px',
@@ -167,11 +166,13 @@
       Object.assign(launcher.style, {
         bottom: '80px', right: '20px',
         top: 'auto', transform: 'none',
+        animation: 'ea-slide-in-mob 0.55s cubic-bezier(0.22,1,0.36,1) 2s both',
       });
     } else {
       Object.assign(launcher.style, {
         top: '65%', right: '30px',
         bottom: 'auto', transform: 'translateY(-50%)',
+        animation: 'ea-slide-in 0.55s cubic-bezier(0.22,1,0.36,1) 2s both',
       });
     }
   }
@@ -182,67 +183,76 @@
     if (isOpen) applyContainerSize();
   });
 
-  /* ── 9. Open / close helpers ─────────────────────────────────────────────── */
+  /* ── 9. Open / close ─────────────────────────────────────────────────────── */
   var isOpen = false;
 
+  function buildOpenInner(hex) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="' + hex + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">' +
+      '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' +
+      '</svg>';
+  }
+
   var closeIconSvg =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0">' +
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0">' +
       '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>' +
     '</svg>';
 
-  var chatIconSvg =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:0.9">' +
-      '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' +
-    '</svg>';
+  function buildLauncherOpen(hex, label) {
+    launcher.innerHTML =
+      buildOpenInner(hex) +
+      '<span style="font-size:14px;font-weight:600;letter-spacing:0.02em;color:' + hex + ';font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif">' + label + '</span>';
+    launcher.appendChild(liveDot);
+    launcher.setAttribute('aria-label', 'Open chat');
+    /* Re-apply breathing animation each time launcher is restored */
+    launcher.style.animation = isMobile()
+      ? 'ea-breathe 3.5s ease-in-out 2.6s infinite'
+      : 'ea-breathe 3.5s ease-in-out 2.6s infinite';
+  }
 
-  function showLauncher(labelHtml) {
+  function buildLauncherClose(hex) {
+    launcher.innerHTML =
+      closeIconSvg +
+      '<span style="font-size:14px;font-weight:600;letter-spacing:0.02em;color:' + hex + ';font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif">Close</span>';
+    launcher.setAttribute('aria-label', 'Close chat');
+    launcher.style.animation = 'none';
+  }
+
+  function showLauncher(hex, label) {
     if (unifiedMode) {
-      launcher.innerHTML = chatIconSvg + '<span>' + labelHtml + '</span>';
+      buildLauncherOpen(hex, label);
       launcher.style.display = 'flex';
-      launcher.setAttribute('aria-label', 'Open chat');
     } else {
       fabWrap.style.display = 'flex';
     }
   }
 
-  function hideLauncherOrShowClose() {
+  function hideLauncherOrShowClose(hex) {
     if (unifiedMode) {
       if (isMobile()) {
         launcher.style.display = 'none';
       } else {
-        /* Stay visible as a close button */
-        launcher.innerHTML = closeIconSvg + '<span>Close</span>';
-        launcher.setAttribute('aria-label', 'Close chat');
+        buildLauncherClose(hex);
       }
     } else {
       fabWrap.style.display = isMobile() ? 'none' : 'flex';
     }
   }
 
-  function doOpen() {
+  function doOpen(hex) {
     isOpen = true;
     applyContainerSize();
     container.style.display   = 'block';
     container.style.animation = 'ea-widget-in 0.28s cubic-bezier(0.22,1,0.36,1) both';
     overlay.style.display     = isMobile() ? 'none' : 'block';
-    hideLauncherOrShowClose();
+    hideLauncherOrShowClose(hex);
   }
 
-  function doClose(labelHtml) {
+  function doClose(hex, label) {
     isOpen = false;
     container.style.display = 'none';
     overlay.style.display   = 'none';
-    showLauncher(labelHtml);
+    showLauncher(hex, label);
   }
-
-  /* Overlay click / Escape / postMessage close */
-  overlay.addEventListener('click', function () { doClose(launcher._label); });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && isOpen) doClose(launcher._label);
-  });
-  window.addEventListener('message', function (e) {
-    if (e.data === 'vaughan:close' && isOpen) doClose(launcher._label);
-  });
 
   /* ── 10. Apply brand colour ─────────────────────────────────────────────── */
   var fabCloseInner =
@@ -253,7 +263,7 @@
   function applyColor(hex) {
     var rgb = hexRgb(hex);
 
-    /* Standard FAB styling */
+    /* Standard FAB */
     radar.style.borderColor = 'rgba(' + rgb + ',0.9)';
     fab.style.background    = 'linear-gradient(135deg, ' + hex + ' 0%, rgba(' + rgb + ',0.8) 100%)';
     fab.style.boxShadow     = '0 4px 22px rgba(' + rgb + ',0.6), inset 0 1px 0 rgba(255,255,255,0.25)';
@@ -278,13 +288,23 @@
       if (isOpen) {
         fab.innerHTML = fabChatInner;
         fab.setAttribute('aria-label', 'Open chat');
-        doClose('');
+        doClose(hex, '');
       } else {
         fab.innerHTML = fabCloseInner;
         fab.setAttribute('aria-label', 'Close chat');
-        doOpen();
+        doOpen(hex);
       }
     });
+
+    /* Unified pill: set CSS custom props for breathing glow */
+    launcher.style.setProperty('--ea-shadow-rest',
+      '0 4px 18px rgba(' + rgb + ',0.18), 0 1px 4px rgba(0,0,0,0.08)');
+    launcher.style.setProperty('--ea-shadow-glow',
+      '0 6px 32px rgba(' + rgb + ',0.42), 0 1px 4px rgba(0,0,0,0.08)');
+    /* Static border tint using brand colour */
+    launcher.style.boxShadow = 'var(--ea-shadow-rest)';
+    /* Subtle brand-tinted border */
+    launcher.style.border = '1px solid rgba(' + rgb + ',0.15)';
   }
 
   /* ── 11. Mount ───────────────────────────────────────────────────────────── */
@@ -296,29 +316,28 @@
 
     if (colorArg) {
       applyColor(colorArg);
-      /* No teaserText in inline-color mode — standard FAB */
       fabWrap.style.display = 'flex';
     } else {
       fetch(origin + '/api/client-config/' + encodeURIComponent(clientId))
         .then(function (r) { return r.json(); })
         .then(function (d) {
-          applyColor(d.brandColour || '#1a365d');
+          var hex = d.brandColour || '#1a365d';
+          applyColor(hex);
 
           if (d.teaserText) {
-            /* Unified button mode */
             unifiedMode = true;
-            fabWrap.style.display = 'none'; // hide circular FAB forever
+            fabWrap.style.display = 'none';
             launcher._label = d.teaserText;
-            launcher.innerHTML = chatIconSvg + '<span>' + d.teaserText + '</span>';
+            launcher._hex   = hex;
             applyLauncherPosition();
+            buildLauncherOpen(hex, d.teaserText);
             launcher.style.display = 'flex';
 
             launcher.onclick = null;
             launcher.addEventListener('click', function () {
-              if (isOpen) { doClose(d.teaserText); } else { doOpen(); }
+              if (isOpen) { doClose(hex, d.teaserText); } else { doOpen(hex); }
             });
           } else {
-            /* Standard FAB mode */
             fabWrap.style.display = 'flex';
           }
         })
@@ -328,6 +347,14 @@
         });
     }
   }
+
+  overlay.addEventListener('click', function () { doClose(launcher._hex, launcher._label); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isOpen) doClose(launcher._hex, launcher._label);
+  });
+  window.addEventListener('message', function (e) {
+    if (e.data === 'vaughan:close' && isOpen) doClose(launcher._hex, launcher._label);
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', mount);
