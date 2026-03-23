@@ -67,6 +67,15 @@
   function applyFabPosition(pos) {
     _pos = pos || 'bottom-right';
 
+    /* On mobile always use bottom-right — admin positions are desktop-only */
+    if (isMobile()) {
+      Object.assign(fabWrap.style, {
+        bottom: '24px', top: 'auto', right: '24px', left: 'auto',
+        animation: 'ea-fab-er 0.6s cubic-bezier(0.22,1,0.36,1) 2s both',
+      });
+      return;
+    }
+
     var isLeft    = _pos.indexOf('left')  !== -1;
     var isFloated = _pos === 'middle-left'  || _pos === 'middle-right' ||
                     _pos === 'lower-left'   || _pos === 'lower-right';
@@ -237,9 +246,9 @@
   function applyContainerSize() {
     if (isMobile()) {
       Object.assign(container.style, {
-        top: '55%', right: '12px', bottom: 'auto', left: 'auto',
-        width: 'calc(100vw - 24px)', height: '60dvh',
-        maxWidth: '420px', maxHeight: '70dvh',
+        top: '50%', left: '12px', right: '12px', bottom: 'auto',
+        width: 'auto', height: '65dvh',
+        maxWidth: 'none', maxHeight: '75dvh',
         borderRadius: '16px', boxShadow: '0 12px 48px rgba(0,0,0,0.32)',
         transform: 'translateY(-50%)',
       });
