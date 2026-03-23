@@ -6,6 +6,7 @@ export interface ClientConfig {
   notificationEmail: string;
   brandColour: string;
   teaserText?: string;
+  widgetPosition?: string; // 'bottom-right' | 'bottom-left' | 'middle-right' | 'middle-left'
 }
 
 export const clients: Record<string, ClientConfig> = {

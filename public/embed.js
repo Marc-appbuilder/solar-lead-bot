@@ -41,27 +41,45 @@
   var styleEl = document.createElement('style');
   styleEl.textContent =
     '@keyframes ea-widget-in{from{opacity:0;transform:translateY(16px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}' +
-    /* FAB slides in from right after 2s */
-    '@keyframes ea-fab-enter{from{opacity:0;transform:translateX(120px)}to{opacity:1;transform:translateX(0)}}' +
-    /* Gentle breathing glow — shadow values set via CSS custom props */
+    /* Slide-in variants: right/left × bottom/middle */
+    '@keyframes ea-fab-er{from{opacity:0;transform:translateX(110px)}to{opacity:1;transform:translateX(0)}}' +
+    '@keyframes ea-fab-el{from{opacity:0;transform:translateX(-110px)}to{opacity:1;transform:translateX(0)}}' +
+    '@keyframes ea-fab-emr{from{opacity:0;transform:translateX(110px) translateY(-50%)}to{opacity:1;transform:translateX(0) translateY(-50%)}}' +
+    '@keyframes ea-fab-eml{from{opacity:0;transform:translateX(-110px) translateY(-50%)}to{opacity:1;transform:translateX(0) translateY(-50%)}}' +
+    /* Gentle breathing glow */
     '@keyframes ea-breathe{0%,100%{box-shadow:var(--ea-glow-rest)}50%{box-shadow:var(--ea-glow-peak)}}' +
     /* Live dot pulse */
     '@keyframes ea-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(0.7);opacity:0.5}}';
   document.head.appendChild(styleEl);
 
   /* ── 5. FAB wrapper ─────────────────────────────────────────────────────── */
+  var _pos = 'bottom-right'; // resolved from config
+
   var fabWrap = document.createElement('div');
   Object.assign(fabWrap.style, {
-    position:  'fixed',
-    bottom:    '24px',
-    right:     '24px',
-    zIndex:    '2147483647',
-    width:     '64px',
-    height:    '64px',
-    overflow:  'visible',
-    /* Slide in from right, 2s delay */
-    animation: 'ea-fab-enter 0.6s cubic-bezier(0.22,1,0.36,1) 2s both',
+    position: 'fixed',
+    zIndex:   '2147483647',
+    width:    '64px',
+    height:   '64px',
+    overflow: 'visible',
   });
+
+  function applyFabPosition(pos) {
+    _pos = pos || 'bottom-right';
+    var isLeft = _pos === 'bottom-left' || _pos === 'middle-left';
+    var isMid  = _pos === 'middle-left' || _pos === 'middle-right';
+    var anim   = isMid
+      ? (isLeft ? 'ea-fab-eml' : 'ea-fab-emr')
+      : (isLeft ? 'ea-fab-el'  : 'ea-fab-er');
+
+    Object.assign(fabWrap.style, {
+      bottom:    isMid ? 'auto'  : '24px',
+      top:       isMid ? '50%'   : 'auto',
+      right:     isLeft ? 'auto' : '24px',
+      left:      isLeft ? '24px' : 'auto',
+      animation: anim + ' 0.6s cubic-bezier(0.22,1,0.36,1) 2s both',
+    });
+  }
 
   /* Radar ring */
   var radar = document.createElement('span');
@@ -135,11 +153,19 @@
         borderRadius: '0', boxShadow: 'none',
       });
     } else {
+      var isLeft = _pos === 'bottom-left' || _pos === 'middle-left';
+      var isMid  = _pos === 'middle-left' || _pos === 'middle-right';
       Object.assign(container.style, {
-        top: 'auto', left: 'auto', bottom: '96px', right: '16px',
-        width: '380px', height: '580px',
-        maxWidth: 'calc(100vw - 24px)', maxHeight: 'calc(100vh - 120px)',
-        borderRadius: '16px', boxShadow: '0 12px 48px rgba(0,0,0,0.28)',
+        right:     isLeft ? 'auto'  : '96px',
+        left:      isLeft ? '96px'  : 'auto',
+        bottom:    isMid  ? 'auto'  : '96px',
+        top:       isMid  ? 'calc(50% - 290px)' : 'auto',
+        width:     '380px',
+        height:    '580px',
+        maxWidth:  isLeft ? 'calc(100vw - 110px)' : 'calc(100vw - 110px)',
+        maxHeight: isMid  ? 'calc(100vh - 40px)'  : 'calc(100vh - 120px)',
+        borderRadius: '16px',
+        boxShadow: '0 12px 48px rgba(0,0,0,0.28)',
       });
     }
   }
@@ -236,12 +262,19 @@
     document.body.appendChild(fabWrap);
 
     if (colorArg) {
+      applyFabPosition('bottom-right');
       applyColor(colorArg);
     } else {
       fetch(origin + '/api/client-config/' + encodeURIComponent(clientId))
         .then(function (r) { return r.json(); })
-        .then(function (d) { applyColor(d.brandColour || '#1a365d'); })
-        .catch(function ()  { applyColor('#1a365d'); });
+        .then(function (d) {
+          applyFabPosition(d.widgetPosition || 'bottom-right');
+          applyColor(d.brandColour || '#1a365d');
+        })
+        .catch(function () {
+          applyFabPosition('bottom-right');
+          applyColor('#1a365d');
+        });
     }
   }
 

@@ -10,15 +10,16 @@ export async function GET(
 
   const { data } = await supabase
     .from('clients')
-    .select('brand_color, teaser_text, border_colour')
+    .select('brand_color, teaser_text, border_colour, widget_position')
     .eq('agent_id', agentId)
     .maybeSingle();
 
   const staticConfig = getClient(agentId);
 
   return NextResponse.json({
-    brandColour:  data?.brand_color   ?? staticConfig.brandColour,
-    teaserText:   data?.teaser_text   ?? staticConfig.teaserText  ?? null,
-    borderColour: data?.border_colour ?? null,
+    brandColour:    data?.brand_color      ?? staticConfig.brandColour,
+    teaserText:     data?.teaser_text      ?? staticConfig.teaserText      ?? null,
+    borderColour:   data?.border_colour    ?? null,
+    widgetPosition: data?.widget_position  ?? staticConfig.widgetPosition  ?? 'bottom-right',
   });
 }

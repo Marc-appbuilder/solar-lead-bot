@@ -25,6 +25,7 @@ interface Client {
   status: 'active' | 'inactive';
   teaser_text: string | null;
   border_colour: string | null;
+  widget_position: string | null;
 }
 
 interface Lead {
@@ -91,6 +92,9 @@ export default function AdminDashboard() {
   const [borderDraft, setBorderDraft]       = useState<string>('');
   const [borderSaving, setBorderSaving]     = useState(false);
   const [borderSaved, setBorderSaved]       = useState(false);
+  const [positionDraft, setPositionDraft]   = useState<string>('bottom-right');
+  const [positionSaving, setPositionSaving] = useState(false);
+  const [positionSaved, setPositionSaved]   = useState(false);
 
   const fetchClients = useCallback(async () => {
     const res = await fetch('/api/clients');
@@ -111,6 +115,8 @@ export default function AdminDashboard() {
     setColorSaved(false);
     setBorderDraft(client.border_colour ?? '');
     setBorderSaved(false);
+    setPositionDraft(client.widget_position ?? 'bottom-right');
+    setPositionSaved(false);
     const res = await fetch(`/api/clients/${client.id}`);
     if (res.ok) {
       const data = await res.json();
@@ -143,6 +149,19 @@ export default function AdminDashboard() {
     setBorderSaved(true);
     setClients(prev => prev.map(c => c.id === clientId ? { ...c, border_colour: borderDraft || null } : c));
     setTimeout(() => setBorderSaved(false), 2000);
+  }
+
+  async function savePosition(clientId: string) {
+    setPositionSaving(true);
+    await fetch(`/api/clients/${clientId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ widget_position: positionDraft }),
+    });
+    setPositionSaving(false);
+    setPositionSaved(true);
+    setClients(prev => prev.map(c => c.id === clientId ? { ...c, widget_position: positionDraft } : c));
+    setTimeout(() => setPositionSaved(false), 2000);
   }
 
   async function saveTeaser(clientId: string) {
@@ -524,6 +543,46 @@ export default function AdminDashboard() {
               }}
             >
               {borderSaving ? 'Saving…' : borderSaved ? '✓ Saved' : 'Save border colour'}
+            </button>
+          </div>
+
+          {/* Widget position */}
+          <div style={{ ...card, padding: '14px 16px' }}>
+            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '10px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              Widget position
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginBottom: '10px' }}>
+              {([
+                { val: 'bottom-left',  label: '↙ Bottom left'  },
+                { val: 'bottom-right', label: '↘ Bottom right' },
+                { val: 'middle-left',  label: '← Middle left'  },
+                { val: 'middle-right', label: '→ Middle right' },
+              ] as { val: string; label: string }[]).map(opt => (
+                <button
+                  key={opt.val}
+                  onClick={() => setPositionDraft(opt.val)}
+                  style={{
+                    padding: '9px 8px', borderRadius: '8px', cursor: 'pointer',
+                    fontSize: '12px', fontWeight: 600, textAlign: 'center',
+                    border: `1px solid ${positionDraft === opt.val ? '#b8882e' : 'rgba(255,255,255,0.08)'}`,
+                    background: positionDraft === opt.val ? 'rgba(184,136,46,0.15)' : 'rgba(255,255,255,0.03)',
+                    color: positionDraft === opt.val ? '#b8882e' : 'rgba(255,255,255,0.4)',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => savePosition(selected.id)}
+              disabled={positionSaving}
+              style={{
+                ...ghostBtn, width: '100%',
+                color: positionSaved ? '#34d399' : 'rgba(255,255,255,0.6)',
+              }}
+            >
+              {positionSaving ? 'Saving…' : positionSaved ? '✓ Saved' : 'Save position'}
             </button>
           </div>
 
