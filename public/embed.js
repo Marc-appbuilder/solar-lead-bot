@@ -66,6 +66,23 @@
 
   function applyFabPosition(pos) {
     _pos = pos || 'bottom-right';
+
+    /* Restore a previously dragged position from localStorage */
+    try {
+      var saved = localStorage.getItem('__vaughan_fab_' + clientId);
+      if (saved && !isMobile()) {
+        var p = JSON.parse(saved);
+        var c = _clampFab(p.x, p.y);
+        Object.assign(fabWrap.style, {
+          bottom: 'auto', right: 'auto',
+          left: c[0] + 'px', top: c[1] + 'px',
+          animation: 'none',
+        });
+        _dragged = true;
+        return;
+      }
+    } catch (_) {}
+
     var isLeft    = _pos.indexOf('left')  !== -1;
     var isFloated = _pos === 'middle-left'  || _pos === 'middle-right' ||
                     _pos === 'lower-left'   || _pos === 'lower-right';
@@ -82,6 +99,95 @@
       animation: anim + ' 0.6s cubic-bezier(0.22,1,0.36,1) 2s both',
     });
   }
+
+  /* ── Drag (desktop only) ─────────────────────────────────────────────── */
+  var _dragged     = false; // true once the FAB has been dragged at least once
+  var _dragging    = false; // true during an active drag move
+  var _justDragged = false; // used to swallow the click that follows a drag-end
+
+  function _clampFab(x, y) {
+    var pad = 8;
+    return [
+      Math.max(pad, Math.min(window.innerWidth  - 64 - pad, x)),
+      Math.max(pad, Math.min(window.innerHeight - 64 - pad, y)),
+    ];
+  }
+
+  function _repoContainer() {
+    var rect = fabWrap.getBoundingClientRect();
+    var cw = 380, ch = 580, gap = 12, pad = 8;
+    var fx = rect.left, fy = rect.top;
+    // Prefer left of FAB when FAB is in the right half of the screen, else right
+    var left = fx > window.innerWidth / 2
+      ? fx - cw - gap
+      : fx + 64 + gap;
+    left = Math.max(pad, Math.min(window.innerWidth - cw - pad, left));
+    // Prefer above FAB when in the bottom half, else below
+    var top = fy + ch > window.innerHeight - pad
+      ? fy - ch + 64
+      : fy;
+    top = Math.max(pad, Math.min(window.innerHeight - ch - pad, top));
+    Object.assign(container.style, {
+      left: left + 'px', top: top + 'px',
+      right: 'auto', bottom: 'auto', transform: 'none',
+    });
+  }
+
+  fabWrap.addEventListener('mousedown', function (e) {
+    if (isMobile() || e.button !== 0) return;
+    var rect = fabWrap.getBoundingClientRect();
+    var startX = rect.left, startY = rect.top;
+    var dx = e.clientX - startX, dy = e.clientY - startY;
+    _dragging = false;
+
+    /* Snapshot current visual position as top/left so we can freely move it */
+    fabWrap.style.animation = 'none';
+    fabWrap.style.bottom = 'auto'; fabWrap.style.right = 'auto';
+    fabWrap.style.left = startX + 'px'; fabWrap.style.top = startY + 'px';
+
+    function onMove(ev) {
+      var nx = ev.clientX - dx, ny = ev.clientY - dy;
+      if (!_dragging && (Math.abs(nx - startX) > 4 || Math.abs(ny - startY) > 4)) {
+        _dragging = true;
+        _dragged  = true;
+        document.body.style.userSelect = 'none';
+      }
+      if (!_dragging) return;
+      var c = _clampFab(nx, ny);
+      fabWrap.style.left = c[0] + 'px';
+      fabWrap.style.top  = c[1] + 'px';
+      if (isOpen) _repoContainer();
+    }
+
+    function onUp() {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup',   onUp);
+      document.body.style.userSelect = '';
+      if (_dragging) {
+        _justDragged = true;
+        try {
+          var rect2 = fabWrap.getBoundingClientRect();
+          localStorage.setItem('__vaughan_fab_' + clientId,
+            JSON.stringify({ x: rect2.left, y: rect2.top }));
+        } catch (_) {}
+      }
+      _dragging = false;
+    }
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup',   onUp);
+  });
+
+  /* Clamp FAB back on-screen if window is resized after dragging */
+  window.addEventListener('resize', function () {
+    if (_dragged && !isMobile()) {
+      var rect = fabWrap.getBoundingClientRect();
+      var c = _clampFab(rect.left, rect.top);
+      fabWrap.style.left = c[0] + 'px';
+      fabWrap.style.top  = c[1] + 'px';
+    }
+    if (isOpen) _dragged && !isMobile() ? _repoContainer() : applyContainerSize();
+  });
 
   /* Radar ring */
   var radar = document.createElement('span');
@@ -159,7 +265,6 @@
   }
 
   applyContainerSize();
-  window.addEventListener('resize', function () { if (isOpen) applyContainerSize(); });
 
   var iframe = document.createElement('iframe');
   iframe.src = origin + '/widget?clientId=' + encodeURIComponent(clientId);
@@ -187,7 +292,7 @@
 
   function openFab() {
     isOpen = true;
-    applyContainerSize();
+    if (_dragged && !isMobile()) { _repoContainer(); } else { applyContainerSize(); }
     container.style.display   = 'block';
     container.style.animation = 'ea-widget-in 0.28s cubic-bezier(0.22,1,0.36,1) both';
     overlay.style.display     = isMobile() ? 'block' : 'block';
@@ -240,6 +345,7 @@
     fab.innerHTML = _chatInner;
     fab.onclick = null;
     fab.addEventListener('click', function () {
+      if (_justDragged) { _justDragged = false; return; }
       if (isOpen) { closeFab(); } else { openFab(); }
     });
   }
