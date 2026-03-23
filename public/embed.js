@@ -48,6 +48,27 @@
     '@keyframes ea-radar{0%{transform:scale(1);opacity:0.85}100%{transform:scale(2.8);opacity:0}}';
   document.head.appendChild(style);
 
+  /* Teaser label (shown above FAB when set, hidden when chat opens) */
+  var teaserEl = document.createElement('div');
+  Object.assign(teaserEl.style, {
+    position:      'fixed',
+    bottom:        '100px',
+    right:         '24px',
+    zIndex:        '2147483647',
+    background:    '#fff',
+    color:         '#1a1a1a',
+    fontSize:      '13px',
+    fontWeight:    '500',
+    fontFamily:    '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    padding:       '7px 14px',
+    borderRadius:  '20px',
+    boxShadow:     '0 2px 12px rgba(0,0,0,0.15)',
+    whiteSpace:    'nowrap',
+    pointerEvents: 'none',
+    display:       'none',
+    animation:     'ea-pop-in 0.35s cubic-bezier(0.34,1.4,0.64,1) 1.2s both',
+  });
+
   /* FAB wrapper */
   var fabWrap = document.createElement('div');
   Object.assign(fabWrap.style, {
@@ -147,6 +168,7 @@
     isOpen = false;
     container.style.display = 'none';
     overlay.style.display   = 'none';
+    if (teaserEl.textContent) teaserEl.style.display = 'block';
   });
 
   /* ── 5. Apply brand colour (called once colour is resolved) ─────────────── */
@@ -191,6 +213,7 @@
         container.style.display  = 'none';
         overlay.style.display    = 'none';
         fabWrap.style.display    = 'flex';
+        if (teaserEl.textContent) teaserEl.style.display = 'block';
         fab.innerHTML = chatInner;
         fab.setAttribute('aria-label', 'Open chat');
       } else {
@@ -201,6 +224,7 @@
         overlay.style.display     = isMobile() ? 'none' : 'block';
         /* Hide FAB on mobile — it sits over the send button */
         fabWrap.style.display     = isMobile() ? 'none' : 'flex';
+        teaserEl.style.display    = 'none';
         fab.innerHTML = closeInner;
         fab.setAttribute('aria-label', 'Close chat');
       }
@@ -216,6 +240,7 @@
       container.style.display = 'none';
       overlay.style.display   = 'none';
       fabWrap.style.display   = 'flex';
+      if (teaserEl.textContent) teaserEl.style.display = 'block';
     }
   });
 
@@ -225,6 +250,7 @@
       container.style.display = 'none';
       overlay.style.display   = 'none';
       fabWrap.style.display   = 'flex';
+      if (teaserEl.textContent) teaserEl.style.display = 'block';
     }
   });
 
@@ -232,17 +258,24 @@
   function mount() {
     document.body.appendChild(overlay);
     document.body.appendChild(container);
+    document.body.appendChild(teaserEl);
     document.body.appendChild(fabWrap);
 
     if (colorArg) {
-      /* Colour supplied inline — apply immediately */
+      /* Colour supplied inline — apply immediately, no teaser (no config fetch) */
       applyColor(colorArg);
     } else {
-      /* Fetch brand colour from server based on clientId */
+      /* Fetch brand colour + teaser text from server */
       fetch(origin + '/api/config?clientId=' + encodeURIComponent(clientId))
         .then(function (r) { return r.json(); })
-        .then(function (d) { applyColor(d.brandColour || '#1a365d'); })
-        .catch(function ()  { applyColor('#1a365d'); });
+        .then(function (d) {
+          applyColor(d.brandColour || '#1a365d');
+          if (d.teaserText) {
+            teaserEl.textContent    = d.teaserText;
+            teaserEl.style.display  = 'block';
+          }
+        })
+        .catch(function () { applyColor('#1a365d'); });
     }
   }
 

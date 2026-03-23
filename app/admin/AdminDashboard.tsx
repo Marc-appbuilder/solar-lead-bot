@@ -23,6 +23,7 @@ interface Client {
   website: string | null;
   brand_color: string;
   status: 'active' | 'inactive';
+  teaser_text: string | null;
 }
 
 interface Lead {
@@ -80,6 +81,9 @@ export default function AdminDashboard() {
   const [saving, setSaving]     = useState(false);
   const [copied, setCopied]     = useState<string | null>(null);
   const [expandedLead, setExpandedLead] = useState<string | null>(null);
+  const [teaserDraft, setTeaserDraft]   = useState<string>('');
+  const [teaserSaving, setTeaserSaving] = useState(false);
+  const [teaserSaved, setTeaserSaved]   = useState(false);
 
   const fetchClients = useCallback(async () => {
     const res = await fetch('/api/clients');
@@ -94,12 +98,26 @@ export default function AdminDashboard() {
     setView('detail');
     setDetailLoading(true);
     setExpandedLead(null);
+    setTeaserDraft(client.teaser_text ?? '');
+    setTeaserSaved(false);
     const res = await fetch(`/api/clients/${client.id}`);
     if (res.ok) {
       const data = await res.json();
       setLeads(data.leads);
     }
     setDetailLoading(false);
+  }
+
+  async function saveTeaser(clientId: string) {
+    setTeaserSaving(true);
+    await fetch(`/api/clients/${clientId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ teaser_text: teaserDraft || null }),
+    });
+    setTeaserSaving(false);
+    setTeaserSaved(true);
+    setTimeout(() => setTeaserSaved(false), 2000);
   }
 
   async function toggleStatus(client: Client) {
@@ -404,6 +422,29 @@ export default function AdminDashboard() {
               }}
             >
               {copied === selected.id ? '✓ Copied!' : '⟨/⟩ Copy embed code'}
+            </button>
+          </div>
+
+          {/* Teaser text */}
+          <div style={{ ...card, padding: '14px 16px' }}>
+            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '8px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              Teaser label
+            </div>
+            <input
+              style={{ ...input, marginBottom: '10px' }}
+              placeholder="e.g. Thinking of selling or letting?"
+              value={teaserDraft}
+              onChange={e => setTeaserDraft(e.target.value)}
+            />
+            <button
+              onClick={() => saveTeaser(selected.id)}
+              disabled={teaserSaving}
+              style={{
+                ...ghostBtn, width: '100%',
+                color: teaserSaved ? '#34d399' : 'rgba(255,255,255,0.6)',
+              }}
+            >
+              {teaserSaving ? 'Saving…' : teaserSaved ? '✓ Saved' : 'Save teaser'}
             </button>
           </div>
 
