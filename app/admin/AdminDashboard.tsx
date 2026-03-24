@@ -19,6 +19,7 @@ interface Client {
   name: string;
   contact_name: string | null;
   email: string | null;
+  notification_email: string | null;
   phone: string | null;
   website: string | null;
   brand_color: string;
@@ -97,6 +98,9 @@ export default function AdminDashboard() {
   const [positionSaved, setPositionSaved]   = useState(false);
   const [positionResetting, setPositionResetting] = useState(false);
   const [positionReset, setPositionReset]   = useState(false);
+  const [infoDraft, setInfoDraft] = useState({ contact_name: '', email: '', notification_email: '', phone: '', website: '' });
+  const [infoSaving, setInfoSaving] = useState(false);
+  const [infoSaved, setInfoSaved]   = useState(false);
 
   const fetchClients = useCallback(async () => {
     const res = await fetch('/api/clients');
@@ -119,6 +123,14 @@ export default function AdminDashboard() {
     setBorderSaved(false);
     setPositionDraft(client.widget_position ?? 'bottom-right');
     setPositionSaved(false);
+    setInfoDraft({
+      contact_name: client.contact_name ?? '',
+      email: client.email ?? '',
+      notification_email: client.notification_email ?? '',
+      phone: client.phone ?? '',
+      website: client.website ?? '',
+    });
+    setInfoSaved(false);
     const res = await fetch(`/api/clients/${client.id}`);
     if (res.ok) {
       const data = await res.json();
@@ -190,6 +202,42 @@ export default function AdminDashboard() {
     setTeaserSaving(false);
     setTeaserSaved(true);
     setTimeout(() => setTeaserSaved(false), 2000);
+  }
+
+  async function saveInfo(clientId: string) {
+    setInfoSaving(true);
+    await fetch(`/api/clients/${clientId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contact_name: infoDraft.contact_name || null,
+        email: infoDraft.email || null,
+        notification_email: infoDraft.notification_email || null,
+        phone: infoDraft.phone || null,
+        website: infoDraft.website || null,
+      }),
+    });
+    setInfoSaving(false);
+    setInfoSaved(true);
+    setClients(prev => prev.map(c => c.id === clientId ? {
+      ...c,
+      contact_name: infoDraft.contact_name || null,
+      email: infoDraft.email || null,
+      notification_email: infoDraft.notification_email || null,
+      phone: infoDraft.phone || null,
+      website: infoDraft.website || null,
+    } : c));
+    if (selected?.id === clientId) {
+      setSelected(prev => prev ? {
+        ...prev,
+        contact_name: infoDraft.contact_name || null,
+        email: infoDraft.email || null,
+        notification_email: infoDraft.notification_email || null,
+        phone: infoDraft.phone || null,
+        website: infoDraft.website || null,
+      } : prev);
+    }
+    setTimeout(() => setInfoSaved(false), 2000);
   }
 
   async function toggleStatus(client: Client) {
@@ -442,37 +490,41 @@ export default function AdminDashboard() {
         </div>
 
         <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {/* Client info card */}
+          {/* Client info card — editable */}
           <div style={{ ...card, padding: '14px 16px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {selected.contact_name && (
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>Contact</span>
-                  <span style={{ fontSize: '13px' }}>{selected.contact_name}</span>
+            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '10px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              Contact info
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '10px' }}>
+              {([
+                { key: 'contact_name', label: 'Contact name', type: 'text', placeholder: 'Jane Smith' },
+                { key: 'email',        label: 'Email',         type: 'email', placeholder: 'jane@example.com' },
+                { key: 'notification_email', label: 'Notification email', type: 'email', placeholder: 'alerts@example.com' },
+                { key: 'phone',        label: 'Phone',         type: 'tel',   placeholder: '+44 1202 512354' },
+                { key: 'website',      label: 'Website',       type: 'url',   placeholder: 'https://example.com' },
+              ] as { key: keyof typeof infoDraft; label: string; type: string; placeholder: string }[]).map(({ key, label, type, placeholder }) => (
+                <div key={key}>
+                  <label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', display: 'block', marginBottom: '3px' }}>{label}</label>
+                  <input
+                    type={type}
+                    value={infoDraft[key]}
+                    placeholder={placeholder}
+                    onChange={e => setInfoDraft(prev => ({ ...prev, [key]: e.target.value }))}
+                    style={{ ...input, width: '100%', boxSizing: 'border-box' }}
+                  />
                 </div>
-              )}
-              {selected.email && (
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>Email</span>
-                  <a href={`mailto:${selected.email}`} style={{ fontSize: '13px', color: '#60a5fa', textDecoration: 'none' }}>{selected.email}</a>
-                </div>
-              )}
-              {selected.phone && (
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>Phone</span>
-                  <a href={`tel:${selected.phone}`} style={{ fontSize: '13px', color: '#60a5fa', textDecoration: 'none' }}>{selected.phone}</a>
-                </div>
-              )}
-              {selected.website && (
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>Website</span>
-                  <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{selected.website}</span>
-                </div>
-              )}
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>Agent ID</span>
-                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace' }}>{selected.agent_id}</span>
-              </div>
+              ))}
+            </div>
+            <button
+              onClick={() => saveInfo(selected.id)}
+              disabled={infoSaving}
+              style={{ ...ghostBtn, width: '100%', color: infoSaved ? '#34d399' : 'rgba(255,255,255,0.6)' }}
+            >
+              {infoSaving ? 'Saving…' : infoSaved ? '✓ Saved' : 'Save contact info'}
+            </button>
+            <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)' }}>Agent ID</span>
+              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', fontFamily: 'monospace' }}>{selected.agent_id}</span>
             </div>
           </div>
 
