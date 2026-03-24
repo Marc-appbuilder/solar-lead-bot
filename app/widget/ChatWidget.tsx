@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { ClientConfig } from '@/lib/clients';
 import type { ChatMessage } from '@/app/api/chat/route';
 
@@ -15,6 +15,32 @@ interface Message extends ChatMessage {
 
 function uid() {
   return Math.random().toString(36).slice(2);
+}
+
+/* Render text with [label](url) markdown links as real <a> tags */
+function renderWithLinks(text: string, linkColour: string) {
+  const parts = text.split(/(\[([^\]]+)\]\((https?:\/\/[^)]+)\))/g);
+  const nodes: React.ReactNode[] = [];
+  let i = 0;
+  while (i < parts.length) {
+    const full = parts[i];
+    // Every 4th chunk starting at 0 is plain text; chunks at i%4===1 are full match
+    if (i % 4 === 0) {
+      if (full) nodes.push(full);
+    } else if (i % 4 === 1) {
+      const label = parts[i + 1];
+      const href  = parts[i + 2];
+      nodes.push(
+        <a key={i} href={href} target="_blank" rel="noopener noreferrer"
+          style={{ color: linkColour, textDecoration: 'underline', wordBreak: 'break-word' }}>
+          {label}
+        </a>
+      );
+      i += 2; // skip label and href captures
+    }
+    i++;
+  }
+  return nodes;
 }
 
 function contrastColour(hex: string): string {
@@ -394,7 +420,7 @@ export default function ChatWidget({ clientId, config }: Props) {
               }}>
                 {isStreamingThis && !msg.content
                   ? <TypingDots colour={brand} />
-                  : msg.content
+                  : renderWithLinks(msg.content, brand)
                 }
               </div>
             </div>
