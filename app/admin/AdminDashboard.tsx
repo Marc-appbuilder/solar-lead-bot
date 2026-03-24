@@ -330,7 +330,7 @@ export default function AdminDashboard() {
                     </div>
                   )}
                 </div>
-                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)', marginLeft: '8px' }}>▶</div>
+                <div style={{ fontSize: '16px', color: 'rgba(255,255,255,0.3)', marginLeft: '8px' }}>›</div>
               </div>
             </div>
 
@@ -427,15 +427,18 @@ export default function AdminDashboard() {
     return (
       <div style={page}>
         <div style={header}>
-          <button onClick={() => setView('list')} style={{ ...ghostBtn, fontSize: '14px' }}>← Back</button>
+          <button onClick={() => setView('list')} style={{ ...ghostBtn, fontSize: '14px' }}>← Clients</button>
           <span style={{ fontWeight: 700, fontSize: '16px' }}>{selected.name}</span>
-          <span style={{
-            background: selected.status === 'active' ? '#0a2e1a' : '#1f1f1f',
-            color: selected.status === 'active' ? '#34d399' : '#6b7280',
-            fontSize: '10px', fontWeight: 700, borderRadius: '99px', padding: '3px 10px',
-          }}>
-            {selected.status}
-          </span>
+          <button
+            onClick={() => setView('list')}
+            style={{
+              background: 'rgba(255,255,255,0.07)', border: 'none', borderRadius: '50%',
+              width: '32px', height: '32px', cursor: 'pointer', color: 'rgba(255,255,255,0.5)',
+              fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}
+            aria-label="Close"
+          >✕</button>
         </div>
 
         <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
