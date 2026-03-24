@@ -11,9 +11,10 @@ function getResend() {
 }
 
 /* ── Rate limiting ──────────────────────────────────────────────────────── */
-const RATE_LIMIT  = 20;
-const WINDOW_MS   = 10 * 60 * 1000;
-const MAX_MSG_LEN = 500;
+const RATE_LIMIT    = 15;          // max API calls per IP per window
+const WINDOW_MS     = 10 * 60 * 1000;
+const MAX_MSG_LEN   = 500;
+const MAX_HISTORY   = 30;          // max messages in a single conversation
 
 const ipCounts = new Map<string, { count: number; resetAt: number }>();
 
@@ -142,6 +143,7 @@ export async function POST(req: NextRequest) {
 
   const sanitisedMessages: Anthropic.MessageParam[] = messages
     .filter((m) => m.role === 'user' || m.role === 'assistant')
+    .slice(-MAX_HISTORY)
     .map((m) => ({ role: m.role, content: String(m.content).slice(0, MAX_MSG_LEN) }));
 
   const encoder = new TextEncoder();
@@ -195,7 +197,22 @@ export async function POST(req: NextRequest) {
 
         // Fire email and save to Supabase as long as we have name + at least one contact method
         if (toolInput.name && (toolInput.email || toolInput.phone)) {
-          sendLeadEmail(toolInput, clientId).catch(console.error);
+          // Duplicate suppression: skip email if same email/phone already captured in last 24h
+          const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+          let isDuplicate = false;
+          if (toolInput.email) {
+            const { data } = await supabase.from('leads')
+              .select('id').eq('agent_id', clientId).eq('email', toolInput.email)
+              .gte('created_at', cutoff).limit(1);
+            if (data && data.length > 0) isDuplicate = true;
+          }
+          if (!isDuplicate && toolInput.phone) {
+            const { data } = await supabase.from('leads')
+              .select('id').eq('agent_id', clientId).eq('phone', toolInput.phone)
+              .gte('created_at', cutoff).limit(1);
+            if (data && data.length > 0) isDuplicate = true;
+          }
+          if (!isDuplicate) sendLeadEmail(toolInput, clientId).catch(console.error);
           supabase.from('leads').insert({
             agent_id:         clientId,
             name:             toolInput.name,
