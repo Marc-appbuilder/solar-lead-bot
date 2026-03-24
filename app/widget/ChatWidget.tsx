@@ -18,7 +18,8 @@ function uid() {
 }
 
 /* Render text with [label](url) markdown links as real <a> tags */
-function renderWithLinks(text: string, linkColour: string) {
+function renderWithLinks(text: string) {
+  const linkColour = '#7eb8f7'; // fixed light-blue — readable on dark backgrounds regardless of brand colour
   const parts = text.split(/(\[([^\]]+)\]\((https?:\/\/[^)]+)\))/g);
   const nodes: React.ReactNode[] = [];
   let i = 0;
@@ -420,7 +421,7 @@ export default function ChatWidget({ clientId, config }: Props) {
               }}>
                 {isStreamingThis && !msg.content
                   ? <TypingDots colour={brand} />
-                  : renderWithLinks(msg.content, brand)
+                  : renderWithLinks(msg.content)
                 }
               </div>
             </div>
