@@ -233,56 +233,8 @@
   fab.addEventListener('mouseover', function () { fab.style.transform = 'scale(1.1)'; });
   fab.addEventListener('mouseout',  function () { fab.style.transform = 'scale(1)'; });
 
-  /* Reset-position button — appears on hover when FAB has been dragged */
-  var resetBtn = document.createElement('button');
-  resetBtn.setAttribute('aria-label', 'Reset position');
-  resetBtn.setAttribute('title', 'Reset position');
-  resetBtn.innerHTML =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>' +
-      '<path d="M3 3v5h5"/>' +
-    '</svg>';
-  Object.assign(resetBtn.style, {
-    position:        'absolute',
-    top:             '-8px',
-    right:           '-8px',
-    width:           '22px',
-    height:          '22px',
-    borderRadius:    '50%',
-    border:          'none',
-    background:      'rgba(30,30,40,0.92)',
-    color:           'rgba(255,255,255,0.75)',
-    cursor:          'pointer',
-    display:         'none',
-    alignItems:      'center',
-    justifyContent:  'center',
-    padding:         '0',
-    boxShadow:       '0 2px 8px rgba(0,0,0,0.4)',
-    zIndex:          '1',
-    transition:      'background 0.15s ease',
-  });
-  resetBtn.addEventListener('mouseover', function () { resetBtn.style.background = 'rgba(60,60,80,0.98)'; });
-  resetBtn.addEventListener('mouseout',  function () { resetBtn.style.background = 'rgba(30,30,40,0.92)'; });
-  resetBtn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    try { sessionStorage.removeItem('__vaughan_fab_' + clientId); } catch (_) {}
-    _dragged = false;
-    resetBtn.style.display = 'none';
-    /* Re-apply the admin position */
-    applyFabPosition(_pos);
-    if (isOpen) applyContainerSize();
-  });
-
-  fabWrap.addEventListener('mouseover', function () {
-    if (_dragged && !isMobile()) resetBtn.style.display = 'flex';
-  });
-  fabWrap.addEventListener('mouseout', function (e) {
-    if (!fabWrap.contains(e.relatedTarget)) resetBtn.style.display = 'none';
-  });
-
   fabWrap.appendChild(radar);
   fabWrap.appendChild(fab);
-  fabWrap.appendChild(resetBtn);
 
   /* ── 6. Widget container ─────────────────────────────────────────────────── */
   var container = document.createElement('div');

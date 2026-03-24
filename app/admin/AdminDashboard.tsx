@@ -95,6 +95,8 @@ export default function AdminDashboard() {
   const [positionDraft, setPositionDraft]   = useState<string>('bottom-right');
   const [positionSaving, setPositionSaving] = useState(false);
   const [positionSaved, setPositionSaved]   = useState(false);
+  const [positionResetting, setPositionResetting] = useState(false);
+  const [positionReset, setPositionReset]   = useState(false);
 
   const fetchClients = useCallback(async () => {
     const res = await fetch('/api/clients');
@@ -162,6 +164,20 @@ export default function AdminDashboard() {
     setPositionSaved(true);
     setClients(prev => prev.map(c => c.id === clientId ? { ...c, widget_position: positionDraft } : c));
     setTimeout(() => setPositionSaved(false), 2000);
+  }
+
+  async function resetPosition(clientId: string) {
+    setPositionResetting(true);
+    await fetch(`/api/clients/${clientId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ widget_position: 'bottom-right' }),
+    });
+    setPositionResetting(false);
+    setPositionReset(true);
+    setPositionDraft('bottom-right');
+    setClients(prev => prev.map(c => c.id === clientId ? { ...c, widget_position: 'bottom-right' } : c));
+    setTimeout(() => setPositionReset(false), 2000);
   }
 
   async function saveTeaser(clientId: string) {
@@ -585,6 +601,17 @@ export default function AdminDashboard() {
               }}
             >
               {positionSaving ? 'Saving…' : positionSaved ? '✓ Saved' : 'Save position'}
+            </button>
+            <button
+              onClick={() => resetPosition(selected.id)}
+              disabled={positionResetting}
+              style={{
+                ...ghostBtn, width: '100%', marginTop: '6px',
+                color: positionReset ? '#34d399' : 'rgba(255,255,255,0.35)',
+                fontSize: '11px',
+              }}
+            >
+              {positionResetting ? 'Resetting…' : positionReset ? '✓ Reset to bottom-right' : '↺ Reset to default (bottom-right)'}
             </button>
           </div>
 
