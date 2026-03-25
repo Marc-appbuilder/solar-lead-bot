@@ -41,6 +41,7 @@
   var styleEl = document.createElement('style');
   styleEl.textContent =
     '@keyframes ea-widget-in{from{opacity:0;transform:translateY(16px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}' +
+    '@keyframes ea-widget-in-mob{from{opacity:0;transform:translateY(calc(-50% + 12px)) scale(0.97)}to{opacity:1;transform:translateY(-50%) scale(1)}}' +
     /* Slide-in variants: right/left × bottom/middle */
     '@keyframes ea-fab-er{from{opacity:0;transform:translateX(110px)}to{opacity:1;transform:translateX(0)}}' +
     '@keyframes ea-fab-el{from{opacity:0;transform:translateX(-110px)}to{opacity:1;transform:translateX(0)}}' +
@@ -303,7 +304,7 @@
     isOpen = true;
     if (_dragged && !isMobile()) { _repoContainer(); } else { applyContainerSize(); }
     container.style.display   = 'block';
-    container.style.animation = 'ea-widget-in 0.28s cubic-bezier(0.22,1,0.36,1) both';
+    container.style.animation = (isMobile() ? 'ea-widget-in-mob' : 'ea-widget-in') + ' 0.28s cubic-bezier(0.22,1,0.36,1) both';
     overlay.style.display     = isMobile() ? 'block' : 'block';
     fabWrap.style.display     = 'flex';
     radar.style.animationPlayState = 'paused';
