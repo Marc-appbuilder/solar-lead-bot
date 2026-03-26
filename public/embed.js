@@ -41,7 +41,7 @@
   var styleEl = document.createElement('style');
   styleEl.textContent =
     '@keyframes ea-widget-in{from{opacity:0;transform:translateY(16px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}' +
-    '@keyframes ea-widget-in-mob{from{opacity:0;transform:translateY(calc(-50% + 12px)) scale(0.97)}to{opacity:1;transform:translateY(-50%) scale(1)}}' +
+    '@keyframes ea-widget-in-mob{from{opacity:0;transform:translateY(12px) scale(0.99)}to{opacity:1;transform:translateY(0) scale(1)}}' +
     /* Slide-in variants: right/left × bottom/middle */
     '@keyframes ea-fab-er{from{opacity:0;transform:translateX(110px)}to{opacity:1;transform:translateX(0)}}' +
     '@keyframes ea-fab-el{from{opacity:0;transform:translateX(-110px)}to{opacity:1;transform:translateX(0)}}' +
@@ -247,11 +247,11 @@
   function applyContainerSize() {
     if (isMobile()) {
       Object.assign(container.style, {
-        top: '50%', left: '12px', right: '12px', bottom: 'auto',
-        width: 'auto', height: '65dvh',
-        maxWidth: 'none', maxHeight: '75dvh',
-        borderRadius: '16px', boxShadow: '0 12px 48px rgba(0,0,0,0.32)',
-        transform: 'translateY(-50%)',
+        top: '0', left: '0', right: '0', bottom: '0',
+        width: '100%', height: '100%',
+        maxWidth: 'none', maxHeight: 'none',
+        borderRadius: '0', boxShadow: 'none',
+        transform: 'none',
       });
     } else {
       var isLeft    = _pos.indexOf('left') !== -1;
