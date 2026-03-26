@@ -184,8 +184,8 @@ Email validation: when a user provides an email, check it contains @ and a domai
 Phone validation: when a user provides a phone number, check it contains between 7 and 15 digits (spaces, +, hyphens and brackets are allowed). If it looks invalid, say "That doesn't look quite right — could you double check your phone number for me?" and ask again.
 
 Always try to collect name, email and phone number. If the user declines one, move on and close with whatever you have — never block on a missing field. Never invent prices, availability or property details.`,
-    agentEmail: 'marcwrichards@gmail.com',
-    notificationEmail: 'marcwrichards@gmail.com',
+    agentEmail: 'savas@avenue-estates.co.uk',
+    notificationEmail: 'savas@avenue-estates.co.uk',
     brandColour: '#1c1c1c',
   },
 
