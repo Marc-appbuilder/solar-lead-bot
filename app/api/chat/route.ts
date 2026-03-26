@@ -11,7 +11,7 @@ function getResend() {
 }
 
 /* ── Rate limiting ──────────────────────────────────────────────────────── */
-const RATE_LIMIT    = 15;          // max API calls per IP per window
+const RATE_LIMIT    = 30;          // max API calls per IP per window
 const WINDOW_MS     = 10 * 60 * 1000;
 const MAX_MSG_LEN   = 500;
 const MAX_HISTORY   = 30;          // max messages in a single conversation

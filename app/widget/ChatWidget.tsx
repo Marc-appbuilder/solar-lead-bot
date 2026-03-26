@@ -140,7 +140,7 @@ export default function ChatWidget({ clientId, config }: Props) {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
-              ? { ...m, content: "I need a quick breather — give me a few minutes and I'll be right back with you! ☕" }
+              ? { ...m, content: "Sorry, we're experiencing high demand right now. Please try again in a few minutes." }
               : m
           )
         );
