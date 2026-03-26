@@ -306,7 +306,7 @@
     container.style.display   = 'block';
     container.style.animation = (isMobile() ? 'ea-widget-in-mob' : 'ea-widget-in') + ' 0.28s cubic-bezier(0.22,1,0.36,1) both';
     overlay.style.display     = isMobile() ? 'block' : 'block';
-    fabWrap.style.display     = 'flex';
+    fabWrap.style.display     = isMobile() ? 'none' : 'flex';
     radar.style.animationPlayState = 'paused';
     fab.innerHTML = closeInner;
     fab.setAttribute('aria-label', 'Close chat');
