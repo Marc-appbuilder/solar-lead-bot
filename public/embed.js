@@ -245,44 +245,45 @@
 
   Object.assign(teaser.style, {
     position:      'absolute',
-    bottom:        '74px',
+    bottom:        '80px',
     right:         '0',
-    background:    '#ffffff',
-    color:         '#1a1a1a',
-    borderRadius:  '12px',
-    boxShadow:     '0 4px 24px rgba(0,0,0,0.18)',
-    padding:       '10px 36px 10px 14px',
-    fontSize:      '14px',
-    lineHeight:    '1.4',
-    whiteSpace:    'nowrap',
+    background:    '#1a1a1a',
+    color:         '#ffffff',
+    borderRadius:  '16px 16px 4px 16px',
+    boxShadow:     '0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.16)',
+    padding:       '12px 40px 12px 16px',
+    fontSize:      '13px',
+    fontFamily:    '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    fontWeight:    '400',
+    lineHeight:    '1.5',
+    letterSpacing: '0.01em',
     cursor:        'pointer',
     display:       'none',
-    maxWidth:      '260px',
-    whiteSpace:    'normal',
+    width:         '220px',
     userSelect:    'none',
   });
-
-  /* Arrow pointing down toward FAB */
-  teaser.innerHTML =
-    '<span style="position:absolute;bottom:-7px;right:20px;width:14px;height:7px;overflow:hidden;display:block;">' +
-      '<span style="position:absolute;top:-7px;left:0;width:14px;height:14px;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,0.18);transform:rotate(45deg);border-radius:2px;"></span>' +
-    '</span>';
 
   var teaserText = document.createElement('span');
   teaser.appendChild(teaserText);
 
   var teaserClose = document.createElement('button');
   Object.assign(teaserClose.style, {
-    position:   'absolute',
-    top:        '6px',
-    right:      '8px',
-    background: 'none',
-    border:     'none',
-    cursor:     'pointer',
-    color:      '#999',
-    fontSize:   '16px',
-    lineHeight: '1',
-    padding:    '0',
+    position:        'absolute',
+    top:             '8px',
+    right:           '10px',
+    background:      'rgba(255,255,255,0.12)',
+    border:          'none',
+    borderRadius:    '50%',
+    cursor:          'pointer',
+    color:           'rgba(255,255,255,0.7)',
+    fontSize:        '13px',
+    lineHeight:      '1',
+    padding:         '0',
+    width:           '20px',
+    height:          '20px',
+    display:         'flex',
+    alignItems:      'center',
+    justifyContent:  'center',
   });
   teaserClose.innerHTML = '&times;';
   teaserClose.setAttribute('aria-label', 'Dismiss');
