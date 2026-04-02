@@ -51,7 +51,7 @@
     '@keyframes ea-breathe{0%,100%{box-shadow:var(--ea-glow-rest)}50%{box-shadow:var(--ea-glow-peak)}}' +
     /* Radar / sonar pulse — emanates from circle outward */
     '@keyframes ea-pulse{0%{transform:scale(1);opacity:0.7}100%{transform:scale(2.6);opacity:0}}' +
-    '@keyframes ea-teaser-in{from{opacity:0;transform:translateY(8px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}';
+    '@keyframes ea-teaser-in{from{opacity:0}to{opacity:1}}';
   document.head.appendChild(styleEl);
 
   /* ── 5. FAB wrapper ─────────────────────────────────────────────────────── */
@@ -283,12 +283,12 @@
     if (_teaserDismissed || isOpen || isMobile()) return;
     teaserText.textContent = text;
     teaser.style.display   = 'block';
-    teaser.style.animation = 'ea-teaser-in 0.3s cubic-bezier(0.22,1,0.36,1) both';
+    teaser.style.animation = 'ea-teaser-in 0.5s ease both';
   }
 
   function initTeaser(text) {
     if (!text) return;
-    _teaserTimer = setTimeout(function () { showTeaser(text); }, 4000);
+    _teaserTimer = setTimeout(function () { showTeaser(text); }, 2500);
   }
 
   /* ── 7. Widget container ─────────────────────────────────────────────────── */
