@@ -247,55 +247,31 @@
     position:      'absolute',
     bottom:        '80px',
     right:         '0',
-    background:    '#1a1a1a',
-    color:         '#ffffff',
-    borderRadius:  '16px 16px 4px 16px',
-    boxShadow:     '0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.16)',
-    padding:       '12px 40px 12px 16px',
-    fontSize:      '13px',
+    background:    '#ffffff',
+    color:         '#1c1c1c',
+    borderRadius:  '12px',
+    boxShadow:     '0 4px 16px rgba(0,0,0,0.12)',
+    padding:       '12px 16px',
+    fontSize:      '14px',
     fontFamily:    '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    fontWeight:    '400',
-    lineHeight:    '1.5',
-    letterSpacing: '0.01em',
+    fontWeight:    '500',
+    lineHeight:    '1.4',
     cursor:        'pointer',
     display:       'none',
-    width:         '220px',
+    whiteSpace:    'nowrap',
     userSelect:    'none',
   });
+
+  /* Triangle pointer at bottom-right toward the FAB */
+  teaser.innerHTML =
+    '<span style="position:absolute;bottom:-7px;right:22px;width:0;height:0;' +
+    'border-left:7px solid transparent;border-right:7px solid transparent;' +
+    'border-top:7px solid #ffffff;display:block;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.08));"></span>';
 
   var teaserText = document.createElement('span');
   teaser.appendChild(teaserText);
 
-  var teaserClose = document.createElement('button');
-  Object.assign(teaserClose.style, {
-    position:        'absolute',
-    top:             '8px',
-    right:           '10px',
-    background:      'rgba(255,255,255,0.12)',
-    border:          'none',
-    borderRadius:    '50%',
-    cursor:          'pointer',
-    color:           'rgba(255,255,255,0.7)',
-    fontSize:        '13px',
-    lineHeight:      '1',
-    padding:         '0',
-    width:           '20px',
-    height:          '20px',
-    display:         'flex',
-    alignItems:      'center',
-    justifyContent:  'center',
-  });
-  teaserClose.innerHTML = '&times;';
-  teaserClose.setAttribute('aria-label', 'Dismiss');
-  teaser.appendChild(teaserClose);
-
   fabWrap.appendChild(teaser);
-
-  teaserClose.addEventListener('click', function (e) {
-    e.stopPropagation();
-    _teaserDismissed = true;
-    teaser.style.display = 'none';
-  });
 
   teaser.addEventListener('click', function () {
     _teaserDismissed = true;
