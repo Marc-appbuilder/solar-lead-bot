@@ -50,7 +50,8 @@
     /* Gentle breathing glow */
     '@keyframes ea-breathe{0%,100%{box-shadow:var(--ea-glow-rest)}50%{box-shadow:var(--ea-glow-peak)}}' +
     /* Radar / sonar pulse — emanates from circle outward */
-    '@keyframes ea-pulse{0%{transform:scale(1);opacity:0.7}100%{transform:scale(2.6);opacity:0}}';
+    '@keyframes ea-pulse{0%{transform:scale(1);opacity:0.7}100%{transform:scale(2.6);opacity:0}}' +
+    '@keyframes ea-teaser-in{from{opacity:0;transform:translateY(8px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}';
   document.head.appendChild(styleEl);
 
   /* ── 5. FAB wrapper ─────────────────────────────────────────────────────── */
@@ -237,7 +238,83 @@
   fabWrap.appendChild(radar);
   fabWrap.appendChild(fab);
 
-  /* ── 6. Widget container ─────────────────────────────────────────────────── */
+  /* ── 6. Teaser bubble ───────────────────────────────────────────────────── */
+  var teaser = document.createElement('div');
+  var _teaserDismissed = false;
+  var _teaserTimer = null;
+
+  Object.assign(teaser.style, {
+    position:      'absolute',
+    bottom:        '74px',
+    right:         '0',
+    background:    '#ffffff',
+    color:         '#1a1a1a',
+    borderRadius:  '12px',
+    boxShadow:     '0 4px 24px rgba(0,0,0,0.18)',
+    padding:       '10px 36px 10px 14px',
+    fontSize:      '14px',
+    lineHeight:    '1.4',
+    whiteSpace:    'nowrap',
+    cursor:        'pointer',
+    display:       'none',
+    maxWidth:      '260px',
+    whiteSpace:    'normal',
+    userSelect:    'none',
+  });
+
+  /* Arrow pointing down toward FAB */
+  teaser.innerHTML =
+    '<span style="position:absolute;bottom:-7px;right:20px;width:14px;height:7px;overflow:hidden;display:block;">' +
+      '<span style="position:absolute;top:-7px;left:0;width:14px;height:14px;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,0.18);transform:rotate(45deg);border-radius:2px;"></span>' +
+    '</span>';
+
+  var teaserText = document.createElement('span');
+  teaser.appendChild(teaserText);
+
+  var teaserClose = document.createElement('button');
+  Object.assign(teaserClose.style, {
+    position:   'absolute',
+    top:        '6px',
+    right:      '8px',
+    background: 'none',
+    border:     'none',
+    cursor:     'pointer',
+    color:      '#999',
+    fontSize:   '16px',
+    lineHeight: '1',
+    padding:    '0',
+  });
+  teaserClose.innerHTML = '&times;';
+  teaserClose.setAttribute('aria-label', 'Dismiss');
+  teaser.appendChild(teaserClose);
+
+  fabWrap.appendChild(teaser);
+
+  teaserClose.addEventListener('click', function (e) {
+    e.stopPropagation();
+    _teaserDismissed = true;
+    teaser.style.display = 'none';
+  });
+
+  teaser.addEventListener('click', function () {
+    _teaserDismissed = true;
+    teaser.style.display = 'none';
+    openFab();
+  });
+
+  function showTeaser(text) {
+    if (_teaserDismissed || isOpen || isMobile()) return;
+    teaserText.textContent = text;
+    teaser.style.display   = 'block';
+    teaser.style.animation = 'ea-teaser-in 0.3s cubic-bezier(0.22,1,0.36,1) both';
+  }
+
+  function initTeaser(text) {
+    if (!text) return;
+    _teaserTimer = setTimeout(function () { showTeaser(text); }, 4000);
+  }
+
+  /* ── 7. Widget container ─────────────────────────────────────────────────── */
   var container = document.createElement('div');
   Object.assign(container.style, {
     position: 'fixed', zIndex: '2147483646',
@@ -302,6 +379,8 @@
 
   function openFab() {
     isOpen = true;
+    teaser.style.display = 'none';
+    if (_teaserTimer) { clearTimeout(_teaserTimer); _teaserTimer = null; }
     if (_dragged && !isMobile()) { _repoContainer(); } else { applyContainerSize(); }
     container.style.display   = 'block';
     container.style.animation = (isMobile() ? 'ea-widget-in-mob' : 'ea-widget-in') + ' 0.28s cubic-bezier(0.22,1,0.36,1) both';
@@ -375,6 +454,7 @@
         .then(function (d) {
           applyFabPosition(d.widgetPosition || 'bottom-right');
           applyColor(d.brandColour || '#1a365d');
+          initTeaser(d.teaserText || null);
         })
         .catch(function () {
           applyFabPosition('bottom-right');
