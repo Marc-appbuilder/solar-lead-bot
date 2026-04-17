@@ -285,22 +285,37 @@ export default function ChatWidget({ clientId, config }: Props) {
         }} />
 
         {/* Avatar */}
-        <div style={{
-          width: '40px',
-          height: '40px',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '15px',
-          fontWeight: 700,
-          flexShrink: 0,
-          background: `linear-gradient(135deg, ${brand} 0%, ${brandLight} 100%)`,
-          color: fg,
-          boxShadow: `0 0 0 2px rgba(${rgb}, 0.3), 0 0 20px rgba(${rgb}, 0.4)`,
-        }}>
-          {config.name.charAt(0)}
-        </div>
+        {clientId === 'avenue-estates' ? (
+          <img
+            src="https://beocrhhfqsvyrkdajjys.supabase.co/storage/v1/object/public/agent-assets/avenue-estates.jpeg"
+            alt="Avenue Estates"
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              objectFit: 'cover',
+              flexShrink: 0,
+              boxShadow: `0 0 0 2px rgba(${rgb}, 0.3), 0 0 20px rgba(${rgb}, 0.4)`,
+            }}
+          />
+        ) : (
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '15px',
+            fontWeight: 700,
+            flexShrink: 0,
+            background: `linear-gradient(135deg, ${brand} 0%, ${brandLight} 100%)`,
+            color: fg,
+            boxShadow: `0 0 0 2px rgba(${rgb}, 0.3), 0 0 20px rgba(${rgb}, 0.4)`,
+          }}>
+            {config.name.charAt(0)}
+          </div>
+        )}
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{
