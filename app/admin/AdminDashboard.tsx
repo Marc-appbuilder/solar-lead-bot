@@ -27,6 +27,7 @@ interface Client {
   teaser_text: string | null;
   border_colour: string | null;
   widget_position: string | null;
+  language: string | null;
 }
 
 interface Lead {
@@ -101,6 +102,9 @@ export default function AdminDashboard() {
   const [infoDraft, setInfoDraft] = useState({ contact_name: '', email: '', notification_email: '', phone: '', website: '' });
   const [infoSaving, setInfoSaving] = useState(false);
   const [infoSaved, setInfoSaved]   = useState(false);
+  const [languageDraft, setLanguageDraft]   = useState<string>('english');
+  const [languageSaving, setLanguageSaving] = useState(false);
+  const [languageSaved, setLanguageSaved]   = useState(false);
 
   const fetchClients = useCallback(async () => {
     const res = await fetch('/api/clients');
@@ -123,6 +127,8 @@ export default function AdminDashboard() {
     setBorderSaved(false);
     setPositionDraft(client.widget_position ?? 'bottom-right');
     setPositionSaved(false);
+    setLanguageDraft(client.language ?? 'english');
+    setLanguageSaved(false);
     setInfoDraft({
       contact_name: client.contact_name ?? '',
       email: client.email ?? '',
@@ -202,6 +208,19 @@ export default function AdminDashboard() {
     setTeaserSaving(false);
     setTeaserSaved(true);
     setTimeout(() => setTeaserSaved(false), 2000);
+  }
+
+  async function saveLanguage(clientId: string) {
+    setLanguageSaving(true);
+    await fetch(`/api/clients/${clientId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ language: languageDraft }),
+    });
+    setLanguageSaving(false);
+    setLanguageSaved(true);
+    setClients(prev => prev.map(c => c.id === clientId ? { ...c, language: languageDraft } : c));
+    setTimeout(() => setLanguageSaved(false), 2000);
   }
 
   async function saveInfo(clientId: string) {
@@ -690,6 +709,37 @@ export default function AdminDashboard() {
               }}
             >
               {teaserSaving ? 'Saving…' : teaserSaved ? '✓ Saved' : 'Save teaser'}
+            </button>
+          </div>
+
+          {/* Language */}
+          <div style={{ ...card, padding: '14px 16px' }}>
+            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '8px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              Language
+            </div>
+            <select
+              value={languageDraft}
+              onChange={e => setLanguageDraft(e.target.value)}
+              style={{
+                ...input,
+                marginBottom: '10px',
+                appearance: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="english">English only</option>
+              <option value="welsh">Welsh only</option>
+              <option value="bilingual">Bilingual (English &amp; Welsh)</option>
+            </select>
+            <button
+              onClick={() => saveLanguage(selected.id)}
+              disabled={languageSaving}
+              style={{
+                ...ghostBtn, width: '100%',
+                color: languageSaved ? '#34d399' : 'rgba(255,255,255,0.6)',
+              }}
+            >
+              {languageSaving ? 'Saving…' : languageSaved ? '✓ Saved' : 'Save language'}
             </button>
           </div>
 

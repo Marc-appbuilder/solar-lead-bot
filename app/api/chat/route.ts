@@ -141,6 +141,21 @@ export async function POST(req: NextRequest) {
 
   const config = getClient(clientId);
 
+  // Fetch language setting from Supabase
+  let languageInstruction = '';
+  const { data: clientRow } = await supabase
+    .from('clients')
+    .select('language')
+    .eq('agent_id', clientId)
+    .maybeSingle();
+  const language = clientRow?.language ?? 'english';
+  if (language === 'welsh') {
+    languageInstruction = '\n\nAlways respond in Welsh (Cymraeg) only regardless of what language the user writes in.';
+  } else if (language === 'bilingual') {
+    languageInstruction = '\n\nYou support English and Welsh languages only. Detect whether the user is writing in English or Welsh and respond in the same language. If unsure, default to English.';
+  }
+  const systemPrompt = config.systemPrompt + languageInstruction;
+
   const sanitisedMessages: Anthropic.MessageParam[] = messages
     .filter((m) => m.role === 'user' || m.role === 'assistant')
     .slice(-MAX_HISTORY)
@@ -158,7 +173,7 @@ export async function POST(req: NextRequest) {
         const firstStream = anthropic.messages.stream({
           model:      'claude-haiku-4-5-20251001',
           max_tokens: 512,
-          system:     config.systemPrompt,
+          system:     systemPrompt,
           messages:   sanitisedMessages,
           tools:      [captureLeadTool],
         });
@@ -253,7 +268,7 @@ export async function POST(req: NextRequest) {
         const followUpStream = anthropic.messages.stream({
           model:      'claude-haiku-4-5-20251001',
           max_tokens: 256,
-          system:     config.systemPrompt,
+          system:     systemPrompt,
           messages:   followUpMessages,
           tools:      [captureLeadTool],
         });
