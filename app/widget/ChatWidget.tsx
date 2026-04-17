@@ -496,17 +496,17 @@ export default function ChatWidget({ clientId, config }: Props) {
       {/* ── Footer ── */}
       <div style={{
         textAlign: 'center',
-        padding: '5px 0 7px',
+        padding: '5px 12px 7px',
         flexShrink: 0,
         background: '#12151c',
         borderTop: '1px solid rgba(255,255,255,0.04)',
       }}>
+        <p style={{ margin: '0 0 3px', fontSize: '9px', color: 'rgba(255,255,255,0.22)', letterSpacing: '0.01em', lineHeight: 1.4 }}>
+          By continuing you agree to your details being shared with {config.name} in accordance with their privacy policy.
+        </p>
         <p style={{ margin: 0, fontSize: '10px', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
           Powered by{' '}
           <span style={{ color: '#b8882e', fontWeight: 700 }}>VaughanAI</span>
-        </p>
-        <p style={{ margin: 0, fontSize: '9px', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.04em', marginTop: '1px' }}>
-          Your first response, every time.
         </p>
       </div>
     </div>
