@@ -44,6 +44,14 @@ function renderWithLinks(text: string) {
   return nodes;
 }
 
+function isImageUrl(text: string): boolean {
+  try {
+    const url = new URL(text);
+    return url.pathname.includes('/roof-photos/') ||
+      /\.(jpg|jpeg|png|gif|webp|heic|heif|avif)(\?|$)/i.test(url.pathname);
+  } catch { return false; }
+}
+
 function contrastColour(hex: string): string {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -99,9 +107,11 @@ export default function ChatWidget({ clientId, config }: Props) {
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [streamingId, setStreamingId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -111,8 +121,7 @@ export default function ChatWidget({ clientId, config }: Props) {
     inputRef.current?.focus();
   }, []);
 
-  async function handleSend() {
-    const text = input.trim();
+  async function sendMessage(text: string) {
     if (!text || streaming) return;
 
     const userMsg: Message = { id: uid(), role: 'user', content: text };
@@ -195,6 +204,35 @@ export default function ChatWidget({ clientId, config }: Props) {
     }
   }
 
+  function handleSend() {
+    sendMessage(input.trim());
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // Reset so the same file can be re-selected if needed
+    e.target.value = '';
+
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: form });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.error ?? 'Upload failed');
+      await sendMessage(data.url);
+    } catch (err) {
+      console.error('[upload]', err);
+      setMessages((prev) => [
+        ...prev,
+        { id: uid(), role: 'assistant', content: "Sorry, the photo didn't upload. Please try again or describe your roof instead." },
+      ]);
+    } finally {
+      setUploading(false);
+    }
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -202,7 +240,7 @@ export default function ChatWidget({ clientId, config }: Props) {
     }
   }
 
-  const canSend = input.trim() && !streaming;
+  const canSend = input.trim() && !streaming && !uploading;
 
   return (
     <div style={{
@@ -217,6 +255,9 @@ export default function ChatWidget({ clientId, config }: Props) {
 
       {/* ── Injected keyframes ── */}
       <style>{`
+        @keyframes vaughan-spin {
+          to { transform: rotate(360deg); }
+        }
         @keyframes vaughan-bounce {
           0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
           30% { transform: translateY(-5px); opacity: 1; }
@@ -348,7 +389,7 @@ export default function ChatWidget({ clientId, config }: Props) {
 
         {/* Close button — always visible so users can dismiss the widget */}
         <button
-          onClick={() => window.parent.postMessage('vaughan:close', '*')}
+          onClick={() => window.parent.postMessage('slb:close', '*')}
           aria-label="Close chat"
           style={{
             flexShrink: 0,
@@ -417,7 +458,9 @@ export default function ChatWidget({ clientId, config }: Props) {
               }}>
                 {isStreamingThis && !msg.content
                   ? <TypingDots colour={brand} />
-                  : renderWithLinks(msg.content)
+                  : isImageUrl(msg.content)
+                    ? <img src={msg.content} alt="Uploaded photo" style={{ maxWidth: '100%', borderRadius: '10px', display: 'block' }} />
+                    : renderWithLinks(msg.content)
                 }
               </div>
             </div>
@@ -437,6 +480,50 @@ export default function ChatWidget({ clientId, config }: Props) {
         background: '#12151c',
         borderTop: '1px solid rgba(255,255,255,0.06)',
       }}>
+        {/* Hidden file input — triggered by camera button */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          style={{ display: 'none' }}
+          onChange={handleFileUpload}
+        />
+
+        {/* Camera upload button */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={streaming || uploading}
+          title="Upload a photo"
+          style={{
+            flexShrink: 0,
+            width: '50px',
+            height: '50px',
+            borderRadius: '50%',
+            border: '1px solid rgba(255,255,255,0.1)',
+            background: uploading ? `rgba(${rgb}, 0.15)` : 'rgba(255,255,255,0.05)',
+            color: uploading ? brand : 'rgba(255,255,255,0.4)',
+            cursor: streaming || uploading ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '20px',
+            transition: 'background 0.2s ease',
+          }}
+          aria-label="Upload photo"
+        >
+          {uploading ? (
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'vaughan-spin 0.8s linear infinite' }}>
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+              <circle cx="12" cy="13" r="3"/>
+            </svg>
+          )}
+        </button>
+
         <textarea
           ref={inputRef}
           className="vaughan-input"
@@ -506,7 +593,7 @@ export default function ChatWidget({ clientId, config }: Props) {
         </p>
         <p style={{ margin: 0, fontSize: '10px', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
           Powered by{' '}
-          <span style={{ color: '#b8882e', fontWeight: 700 }}>VaughanAI</span>
+          <span style={{ color: '#f97316', fontWeight: 700 }}>SolarDesk</span>
         </p>
       </div>
     </div>

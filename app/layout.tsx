@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Vaughan',
-  description: 'Embeddable AI chat widget, powered by Claude.',
+  title: 'SolarDesk',
+  description: 'AI-powered solar lead capture widget.',
 };
 
 export default function RootLayout({

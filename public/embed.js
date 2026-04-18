@@ -1,12 +1,12 @@
 /**
- * Vaughan embed script
+ * SolarDesk embed script
  *
  * Usage — paste before </body> on any page:
- *   <script src="https://app.vaughanai.co/embed.js?clientId=demo" async></script>
+ *   <script src="https://app.solardesk.co/embed.js?clientId=solar-demo" async></script>
  *
  * Optional query params:
- *   clientId  — which agent config to load  (default: "demo")
- *   color     — override brand hex color    (auto-fetched from server if omitted)
+ *   clientId  — which client config to load  (default: "solar-demo")
+ *   color     — override brand hex color      (auto-fetched from server if omitted)
  */
 (function () {
   'use strict';
@@ -25,8 +25,8 @@
   var colorArg = srcUrl.searchParams.get('color');
 
   /* ── 2. Avoid double-init ────────────────────────────────────────────────── */
-  if (window.__vaughanLoaded) return;
-  window.__vaughanLoaded = true;
+  if (window.__solarDeskLoaded) return;
+  window.__solarDeskLoaded = true;
 
   /* ── 3. Helpers ──────────────────────────────────────────────────────────── */
   function hexRgb(hex) {
@@ -97,7 +97,7 @@
     /* Apply any drag offset saved this session (overrides admin position,
        but only until the user closes the tab / clears the session) */
     try {
-      var saved = sessionStorage.getItem('__vaughan_fab_' + clientId);
+      var saved = sessionStorage.getItem('__slb_fab_' + clientId);
       if (saved && !isMobile()) {
         var p = JSON.parse(saved);
         var c = _clampFab(p.x, p.y);
@@ -178,7 +178,7 @@
         _justDragged = true;
         try {
           var rect2 = fabWrap.getBoundingClientRect();
-          sessionStorage.setItem('__vaughan_fab_' + clientId,
+          sessionStorage.setItem('__slb_fab_' + clientId,
             JSON.stringify({ x: rect2.left, y: rect2.top }));
         } catch (_) {}
       }
@@ -332,7 +332,7 @@
 
   var iframe = document.createElement('iframe');
   iframe.src = origin + '/widget?clientId=' + encodeURIComponent(clientId);
-  iframe.title = 'Vaughan chat';
+  iframe.title = 'SolarDesk chat';
   iframe.setAttribute('allow', 'clipboard-write');
   Object.assign(iframe.style, { width: '100%', height: '100%', border: 'none', display: 'block' });
   container.appendChild(iframe);
@@ -350,7 +350,7 @@
 
   overlay.addEventListener('click', function () { if (isOpen) closeFab(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen) closeFab(); });
-  window.addEventListener('message', function (e) { if (e.data === 'vaughan:close' && isOpen) closeFab(); });
+  window.addEventListener('message', function (e) { if (e.data === 'slb:close' && isOpen) closeFab(); });
 
   var _chatInner = '';
 

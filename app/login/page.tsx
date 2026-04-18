@@ -69,7 +69,7 @@ export default function LoginPage() {
           color: '#f8f3ea',
           lineHeight: 1,
         }}>
-          Vaughan<span style={{ color: '#b8882e' }}>AI</span>
+          Solar<span style={{ color: '#f97316' }}>Desk</span>
         </div>
         <div style={{
           marginTop: '6px',
@@ -78,7 +78,7 @@ export default function LoginPage() {
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
         }}>
-          Estate agent platform
+          Solar lead capture platform
         </div>
       </div>
 
@@ -113,7 +113,7 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <input
                 type="email"
-                placeholder="you@agency.co.uk"
+                placeholder="you@example.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -186,7 +186,7 @@ export default function LoginPage() {
         fontSize: '12px',
         color: 'rgba(248,243,234,0.2)',
       }}>
-        © {new Date().getFullYear()} VaughanAI
+        © {new Date().getFullYear()} SolarDesk
       </p>
     </div>
   );

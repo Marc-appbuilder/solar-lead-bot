@@ -10,10 +10,14 @@ interface Lead {
   id: string;
   created_at: string;
   agent_id: string;
-  name: string;
+  name: string | null;
   email: string | null;
   phone: string | null;
-  enquiry_type: string | null;
+  postcode: string | null;
+  owns_property: boolean | null;
+  monthly_bill: string | null;
+  roof_photo_url: string | null;
+  gold: boolean | null;
   notes: string | null;
   status: Status;
   raw_conversation: string | null;
@@ -131,7 +135,7 @@ export default function LeadInbox() {
       <div style={{ fontSize: '32px', marginBottom: '16px' }}>🔒</div>
       <h2 style={{ color: '#e8eaf0', fontSize: '18px', fontWeight: 700, margin: '0 0 8px' }}>No account found</h2>
       <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px', lineHeight: 1.6, maxWidth: '300px', margin: '0 0 24px' }}>
-        Your email isn't linked to an estate agent account. Please contact support to get set up.
+        Your email isn't linked to a SolarDesk account. Please contact support to get set up.
       </p>
       <button
         onClick={async () => {
@@ -269,7 +273,7 @@ export default function LeadInbox() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                      <span style={{ fontWeight: 700, fontSize: '15px' }}>{lead.name}</span>
+                      <span style={{ fontWeight: 700, fontSize: '15px' }}>{lead.phone ?? 'Unknown'}</span>
                       <span style={{
                         background: sc.bg, color: sc.text,
                         fontSize: '10px', fontWeight: 700,
@@ -278,14 +282,23 @@ export default function LeadInbox() {
                       }}>
                         {lead.status}
                       </span>
-                      {lead.enquiry_type && (
+                      {lead.gold && (
+                        <span style={{
+                          background: '#78350f', color: '#fbbf24',
+                          fontSize: '10px', fontWeight: 700,
+                          borderRadius: '99px', padding: '2px 8px',
+                        }}>
+                          ⭐ Gold
+                        </span>
+                      )}
+                      {lead.monthly_bill && (
                         <span style={{
                           background: 'rgba(255,255,255,0.06)',
                           color: 'rgba(255,255,255,0.45)',
                           fontSize: '10px', borderRadius: '99px',
-                          padding: '2px 8px', textTransform: 'capitalize',
+                          padding: '2px 8px',
                         }}>
-                          {lead.enquiry_type}
+                          {lead.monthly_bill}
                         </span>
                       )}
                     </div>
@@ -294,11 +307,9 @@ export default function LeadInbox() {
                       color: 'rgba(255,255,255,0.4)',
                       display: 'flex', gap: '10px', flexWrap: 'wrap',
                     }}>
-                      {lead.phone && <span>{lead.phone}</span>}
-                      {lead.email && (
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '200px' }}>
-                          {lead.email}
-                        </span>
+                      {lead.postcode && <span>{lead.postcode}</span>}
+                      {lead.owns_property !== null && (
+                        <span>{lead.owns_property ? 'Homeowner' : 'Not owner'}</span>
                       )}
                     </div>
                   </div>
@@ -326,39 +337,57 @@ export default function LeadInbox() {
                   </div>
 
                   {/* Action buttons */}
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    {lead.phone && (
-                      <>
-                        <a href={`tel:${lead.phone}`} style={{
-                          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          gap: '6px', padding: '11px 8px', borderRadius: '10px',
-                          background: '#1e3a5f', color: '#60a5fa',
-                          textDecoration: 'none', fontSize: '13px', fontWeight: 600,
-                        }}>
-                          📞 Call
-                        </a>
-                        <a
-                          href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`}
-                          target="_blank" rel="noreferrer"
-                          style={{
-                            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            gap: '6px', padding: '11px 8px', borderRadius: '10px',
-                            background: '#0a2e1a', color: '#34d399',
-                            textDecoration: 'none', fontSize: '13px', fontWeight: 600,
-                          }}
-                        >
-                          💬 WhatsApp
-                        </a>
-                      </>
-                    )}
-                    {lead.email && (
-                      <a href={`mailto:${lead.email}`} style={{
+                  {lead.phone && (
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <a href={`tel:${lead.phone}`} style={{
                         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
                         gap: '6px', padding: '11px 8px', borderRadius: '10px',
-                        background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.65)',
+                        background: '#1e3a5f', color: '#60a5fa',
                         textDecoration: 'none', fontSize: '13px', fontWeight: 600,
                       }}>
-                        ✉️ Email
+                        📞 Call
+                      </a>
+                      <a
+                        href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`}
+                        target="_blank" rel="noreferrer"
+                        style={{
+                          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          gap: '6px', padding: '11px 8px', borderRadius: '10px',
+                          background: '#0a2e1a', color: '#34d399',
+                          textDecoration: 'none', fontSize: '13px', fontWeight: 600,
+                        }}
+                      >
+                        💬 WhatsApp
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Solar details */}
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {lead.postcode && (
+                      <div style={{ background: '#0d0f14', borderRadius: '8px', padding: '8px 12px', fontSize: '12px' }}>
+                        <span style={{ color: 'rgba(255,255,255,0.3)', marginRight: '6px' }}>Postcode</span>
+                        <span style={{ color: '#e8eaf0', fontWeight: 600 }}>{lead.postcode}</span>
+                      </div>
+                    )}
+                    {lead.monthly_bill && (
+                      <div style={{ background: '#0d0f14', borderRadius: '8px', padding: '8px 12px', fontSize: '12px' }}>
+                        <span style={{ color: 'rgba(255,255,255,0.3)', marginRight: '6px' }}>Bill</span>
+                        <span style={{ color: '#e8eaf0', fontWeight: 600 }}>{lead.monthly_bill}</span>
+                      </div>
+                    )}
+                    {lead.owns_property !== null && (
+                      <div style={{ background: '#0d0f14', borderRadius: '8px', padding: '8px 12px', fontSize: '12px' }}>
+                        <span style={{ color: 'rgba(255,255,255,0.3)', marginRight: '6px' }}>Owner</span>
+                        <span style={{ color: lead.owns_property ? '#34d399' : '#f87171', fontWeight: 600 }}>{lead.owns_property ? 'Yes' : 'No'}</span>
+                      </div>
+                    )}
+                    {lead.roof_photo_url && (
+                      <a href={lead.roof_photo_url} target="_blank" rel="noreferrer" style={{
+                        background: '#0d0f14', borderRadius: '8px', padding: '8px 12px', fontSize: '12px',
+                        color: '#f97316', textDecoration: 'none', fontWeight: 600,
+                      }}>
+                        📷 Roof photo
                       </a>
                     )}
                   </div>

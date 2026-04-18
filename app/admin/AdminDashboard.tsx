@@ -34,10 +34,13 @@ interface Lead {
   id: string;
   created_at: string;
   agent_id: string;
-  name: string;
+  name: string | null;
   email: string | null;
   phone: string | null;
-  enquiry_type: string | null;
+  postcode: string | null;
+  monthly_bill: string | null;
+  owns_property: boolean | null;
+  gold: boolean | null;
   notes: string | null;
   status: 'new' | 'contacted' | 'qualified' | 'dead';
   raw_conversation: string | null;
@@ -60,7 +63,7 @@ function timeAgo(iso: string): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-const EMBED_BASE = 'https://app.vaughanai.co';
+const EMBED_BASE = 'https://app.solardesk.co';
 
 function embedSnippet(client: Client) {
   return `<script src="${EMBED_BASE}/embed.js?clientId=${client.agent_id}" async></script>`;
@@ -782,7 +785,7 @@ export default function AdminDashboard() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                            <span style={{ fontWeight: 700, fontSize: '14px' }}>{lead.name}</span>
+                            <span style={{ fontWeight: 700, fontSize: '14px' }}>{lead.phone ?? lead.name ?? 'Unknown'}</span>
                             <span style={{
                               background: sc.bg, color: sc.text,
                               fontSize: '10px', fontWeight: 700, borderRadius: '99px',

@@ -34,22 +34,20 @@ function checkRateLimit(ip: string): boolean {
 const captureLeadTool: Anthropic.Tool = {
   name: 'capture_lead',
   description:
-    'Call this tool once you have asked for ALL THREE of: name, email address, and phone number, ' +
-    'and received a response to each — whether the user provided the value or declined to give it. ' +
-    'Do NOT fire early just because you have name + one contact method. ' +
-    'Always ask for email AND phone before calling this tool. ' +
-    'If the user declines or ignores a field, treat it as declined and move on — then call this tool with whatever was collected. ' +
-    'Never skip this tool because a field is missing.',
+    'Call this tool as soon as the user provides their mobile number (step 6). ' +
+    'Include all fields collected during the conversation. ' +
+    'Never skip this tool because a field is missing — call it with whatever was collected.',
   input_schema: {
     type: 'object' as const,
     properties: {
-      name:         { type: 'string', description: 'Full name of the lead' },
-      email:        { type: 'string', description: 'Email address, or omit if not provided' },
-      phone:        { type: 'string', description: 'Phone number, or omit if not provided' },
-      enquiry_type: { type: 'string', enum: ['vendor', 'landlord', 'buyer', 'tenant', 'other'], description: 'Best classification of what the lead is looking to do' },
-      summary:      { type: 'string', description: 'One or two sentence summary of what they are looking for' },
+      phone:          { type: 'string', description: 'Mobile number provided in step 6' },
+      postcode:       { type: 'string', description: 'UK postcode provided in step 2' },
+      owns_property:  { type: 'boolean', description: 'Whether they own the property (step 3)' },
+      monthly_bill:   { type: 'string', enum: ['Under £100', '£100–£150', '£150–£250', '£250+'], description: 'Average monthly electricity bill (step 4)' },
+      roof_photo_url: { type: 'string', description: 'URL of roof or fuse box photo if provided in step 5, otherwise omit' },
+      summary:        { type: 'string', description: 'One sentence summary of the lead' },
     },
-    required: ['name'],
+    required: ['phone'],
   },
 };
 
@@ -61,6 +59,8 @@ function escapeHtml(str: string): string {
 }
 
 function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): string {
+  const isGold = lead.owns_property === true &&
+    (lead.monthly_bill === '£150–£250' || lead.monthly_bill === '£250+');
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"/>
@@ -70,10 +70,11 @@ function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): 
   .header{background:${brandColour};color:#fff;padding:24px 32px}
   .header h1{margin:0;font-size:20px;font-weight:700}
   .header p{margin:4px 0 0;font-size:13px;opacity:.8}
+  .gold{display:inline-block;background:#fbbf24;color:#78350f;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-top:8px}
   .body{padding:28px 32px}
   table{border-collapse:collapse;width:100%}
   td{padding:10px 14px;border:1px solid #e8e8e8;vertical-align:top;font-size:14px}
-  td:first-child{background:#f9f9f9;font-weight:600;width:120px;color:#555}
+  td:first-child{background:#f9f9f9;font-weight:600;width:140px;color:#555}
   .summary{margin-top:20px;background:#f9f9f9;border-left:4px solid ${brandColour};padding:14px 18px;border-radius:4px;font-size:14px;white-space:pre-wrap;color:#333}
   .footer{margin-top:24px;font-size:11px;color:#aaa}
 </style>
@@ -81,17 +82,20 @@ function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): 
 <body>
 <div class="wrapper">
   <div class="header">
-    <h1>New lead — ${escapeHtml(clientName)}</h1>
+    <h1>New solar lead — ${escapeHtml(clientName)}</h1>
     <p>${new Date().toUTCString()}</p>
+    ${isGold ? '<span class="gold">⭐ Gold Lead</span>' : ''}
   </div>
   <div class="body">
     <table>
-      <tr><td>Name</td><td>${escapeHtml(lead.name)}</td></tr>
-      <tr><td>Email</td><td>${lead.email ? `<a href="mailto:${escapeHtml(lead.email)}" style="color:${brandColour}">${escapeHtml(lead.email)}</a>` : '<span style="color:#aaa">Not provided</span>'}</td></tr>
       <tr><td>Phone</td><td>${lead.phone ? `<a href="tel:${escapeHtml(lead.phone)}" style="color:${brandColour}">${escapeHtml(lead.phone)}</a>` : '<span style="color:#aaa">Not provided</span>'}</td></tr>
+      <tr><td>Postcode</td><td>${lead.postcode ? escapeHtml(lead.postcode) : '<span style="color:#aaa">Not provided</span>'}</td></tr>
+      <tr><td>Owns property</td><td>${lead.owns_property === true ? 'Yes' : lead.owns_property === false ? 'No' : '<span style="color:#aaa">Unknown</span>'}</td></tr>
+      <tr><td>Monthly bill</td><td>${lead.monthly_bill ? escapeHtml(lead.monthly_bill) : '<span style="color:#aaa">Not provided</span>'}</td></tr>
+      ${lead.roof_photo_url ? `<tr><td>Roof photo</td><td><a href="${escapeHtml(lead.roof_photo_url)}" style="color:${brandColour}">View photo</a></td></tr>` : ''}
     </table>
-    ${lead.summary ? `<div class="summary"><strong>What they were looking for:</strong>\n${escapeHtml(lead.summary)}</div>` : ''}
-    <div class="footer">Sent automatically by VaughanAI</div>
+    ${lead.summary ? `<div class="summary"><strong>Summary:</strong>\n${escapeHtml(lead.summary)}</div>` : ''}
+    <div class="footer">Sent automatically by SolarDesk</div>
   </div>
 </div>
 </body></html>`;
@@ -100,10 +104,9 @@ function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): 
 async function sendLeadEmail(lead: LeadPayload, clientId: string) {
   const config = getClient(clientId);
   const { error } = await getResend().emails.send({
-    from: 'VaughanAI <leads@vaughanai.co>',
+    from: 'SolarDesk <leads@solardesk.co>',
     to: config.notificationEmail,
-    ...(lead.email ? { replyTo: lead.email } : {}),
-    subject: `New lead — ${config.name}`,
+    subject: `New solar lead — ${config.name}`,
     html: buildHtml(lead, config.name, config.brandColour),
   });
   if (error) console.error('[lead] resend error:', error);
@@ -202,7 +205,7 @@ export async function POST(req: NextRequest) {
         }
 
         /* ── Tool called: parse input, fire email, continue ── */
-        let toolInput: LeadPayload = { clientId, name: '', email: '' };
+        let toolInput: LeadPayload = { clientId };
         try {
           const parsed = JSON.parse(toolRawInput);
           toolInput = { clientId, ...parsed };
@@ -210,30 +213,26 @@ export async function POST(req: NextRequest) {
           console.error('[chat] failed to parse tool input:', toolRawInput);
         }
 
-        // Fire email and save to Supabase as long as we have name + at least one contact method
-        if (toolInput.name && (toolInput.email || toolInput.phone)) {
-          // Duplicate suppression: skip email if same email/phone already captured in last 24h
+        // Fire email and save to Supabase as long as we have a phone number
+        if (toolInput.phone) {
+          // Duplicate suppression: skip email if same phone already captured in last 24h
           const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
           let isDuplicate = false;
-          if (toolInput.email) {
-            const { data } = await supabase.from('leads')
-              .select('id').eq('agent_id', clientId).eq('email', toolInput.email)
-              .gte('created_at', cutoff).limit(1);
-            if (data && data.length > 0) isDuplicate = true;
-          }
-          if (!isDuplicate && toolInput.phone) {
-            const { data } = await supabase.from('leads')
-              .select('id').eq('agent_id', clientId).eq('phone', toolInput.phone)
-              .gte('created_at', cutoff).limit(1);
-            if (data && data.length > 0) isDuplicate = true;
-          }
+          const { data } = await supabase.from('leads')
+            .select('id').eq('agent_id', clientId).eq('phone', toolInput.phone)
+            .gte('created_at', cutoff).limit(1);
+          if (data && data.length > 0) isDuplicate = true;
           if (!isDuplicate) sendLeadEmail(toolInput, clientId).catch(console.error);
+          const isGold = toolInput.owns_property === true &&
+            (toolInput.monthly_bill === '£150–£250' || toolInput.monthly_bill === '£250+');
           supabase.from('leads').insert({
             agent_id:         clientId,
-            name:             toolInput.name,
-            email:            toolInput.email ?? null,
-            phone:            toolInput.phone ?? null,
-            enquiry_type:     (toolInput as unknown as Record<string, unknown>).enquiry_type as string ?? null,
+            phone:            toolInput.phone,
+            postcode:         toolInput.postcode ?? null,
+            owns_property:    toolInput.owns_property ?? null,
+            monthly_bill:     toolInput.monthly_bill ?? null,
+            roof_photo_url:   toolInput.roof_photo_url ?? null,
+            gold:             isGold,
             notes:            toolInput.summary ?? null,
             raw_conversation: sanitisedMessages
               .map((m) => `${m.role}: ${m.content}`)
