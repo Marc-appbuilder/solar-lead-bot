@@ -439,8 +439,8 @@ export default function AdminDashboard() {
 
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {([
-          { key: 'name',         label: 'Agency name *',    placeholder: 'Avenue Estates' },
-          { key: 'agent_id',     label: 'Agent ID *',       placeholder: 'avenue-estates' },
+          { key: 'name',         label: 'Client name *',    placeholder: "Steve's Solar" },
+          { key: 'agent_id',     label: 'Client ID *',      placeholder: 'steves-solar' },
           { key: 'contact_name', label: 'Contact person',   placeholder: 'Jane Smith' },
           { key: 'email',        label: 'Email',            placeholder: 'jane@avenue.co.uk' },
           { key: 'phone',        label: 'Phone',            placeholder: '+44 7700 900000' },
@@ -699,7 +699,7 @@ export default function AdminDashboard() {
             </div>
             <input
               style={{ ...input, marginBottom: '10px' }}
-              placeholder="e.g. Thinking of selling or letting?"
+              placeholder="e.g. Get a free solar quote!"
               value={teaserDraft}
               onChange={e => setTeaserDraft(e.target.value)}
             />
