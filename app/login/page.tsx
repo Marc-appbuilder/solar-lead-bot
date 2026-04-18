@@ -43,74 +43,31 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{
-      minHeight: '100dvh',
-      background: '#0f1f3d',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-      WebkitFontSmoothing: 'antialiased',
-    }}>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&display=swap"
-        rel="stylesheet"
-      />
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-[#0f172a] px-5 py-10 font-sans antialiased">
 
-      {/* Logo / wordmark */}
-      <div style={{ marginBottom: '40px', textAlign: 'center' }}>
-        <div style={{
-          fontFamily: '"Cormorant Garamond", serif',
-          fontSize: '42px',
-          fontWeight: 700,
-          letterSpacing: '0.02em',
-          color: '#f8f3ea',
-          lineHeight: 1,
-        }}>
-          Solar<span style={{ color: '#f97316' }}>Desk</span>
+      {/* Logo */}
+      <div className="mb-10 text-center">
+        <div className="flex items-center justify-center gap-2">
+          <span className="text-2xl">☀️</span>
+          <span className="text-2xl font-black tracking-tight text-white">
+            Solar<span className="text-amber-400">Desk</span>
+          </span>
         </div>
-        <div style={{
-          marginTop: '6px',
-          fontSize: '13px',
-          color: 'rgba(248,243,234,0.4)',
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-        }}>
-          Solar lead capture platform
-        </div>
+        <p className="mt-2 text-xs font-semibold uppercase tracking-widest text-white/30">
+          Client Login
+        </p>
       </div>
 
       {/* Card */}
-      <div style={{
-        width: '100%',
-        maxWidth: '380px',
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(184,136,46,0.2)',
-        borderRadius: '20px',
-        padding: '32px 28px',
-      }}>
+      <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/8 bg-[#0b1120]">
         {!sent ? (
-          <>
-            <h1 style={{
-              margin: '0 0 6px',
-              fontSize: '20px',
-              fontWeight: 700,
-              color: '#f8f3ea',
-            }}>
-              Sign in
-            </h1>
-            <p style={{
-              margin: '0 0 24px',
-              fontSize: '14px',
-              color: 'rgba(248,243,234,0.45)',
-              lineHeight: 1.5,
-            }}>
+          <div className="px-8 py-8">
+            <h1 className="mb-1 text-xl font-black text-white">Sign in</h1>
+            <p className="mb-7 text-sm text-white/40">
               Enter your email and we'll send you a magic link.
             </p>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <input
                 type="email"
                 placeholder="you@example.com"
@@ -118,62 +75,34 @@ export default function LoginPage() {
                 onChange={e => setEmail(e.target.value)}
                 required
                 autoFocus
-                style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(184,136,46,0.25)',
-                  borderRadius: '12px',
-                  padding: '13px 16px',
-                  color: '#f8f3ea',
-                  fontSize: '15px',
-                  outline: 'none',
-                  width: '100%',
-                  boxSizing: 'border-box',
-                }}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder-white/25 outline-none transition focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/30"
               />
 
               {error && (
-                <p style={{ margin: 0, fontSize: '13px', color: '#f87171' }}>{error}</p>
+                <p className="text-xs text-red-400">{error}</p>
               )}
 
               <button
                 type="submit"
                 disabled={loading || !email}
-                style={{
-                  background: loading || !email ? 'rgba(184,136,46,0.4)' : '#b8882e',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '14px',
-                  fontSize: '15px',
-                  fontWeight: 700,
-                  cursor: loading || !email ? 'not-allowed' : 'pointer',
-                  transition: 'background 0.15s ease',
-                }}
+                className="w-full rounded-xl bg-amber-400 py-3.5 text-sm font-bold text-[#0f172a] transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {loading ? 'Sending…' : 'Send magic link'}
               </button>
             </form>
-          </>
+          </div>
         ) : (
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '40px', marginBottom: '16px' }}>✉️</div>
-            <h2 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: 700, color: '#f8f3ea' }}>
-              Check your inbox
-            </h2>
-            <p style={{ margin: '0 0 20px', fontSize: '14px', color: 'rgba(248,243,234,0.5)', lineHeight: 1.6 }}>
-              We sent a magic link to <strong style={{ color: '#f8f3ea' }}>{email}</strong>. Click it to sign in.
+          <div className="px-8 py-10 text-center">
+            <div className="mb-4 text-4xl">✉️</div>
+            <h2 className="mb-2 text-lg font-black text-white">Check your inbox</h2>
+            <p className="mb-7 text-sm leading-relaxed text-white/40">
+              We sent a magic link to{' '}
+              <span className="font-semibold text-white">{email}</span>.
+              Click it to sign in.
             </p>
             <button
               onClick={() => { setSent(false); setEmail(''); }}
-              style={{
-                background: 'transparent',
-                border: '1px solid rgba(184,136,46,0.3)',
-                borderRadius: '10px',
-                padding: '10px 20px',
-                color: 'rgba(248,243,234,0.5)',
-                fontSize: '13px',
-                cursor: 'pointer',
-              }}
+              className="rounded-xl border border-white/10 px-5 py-2.5 text-sm text-white/40 transition hover:border-white/20 hover:text-white/60"
             >
               Use a different email
             </button>
@@ -181,11 +110,7 @@ export default function LoginPage() {
         )}
       </div>
 
-      <p style={{
-        marginTop: '32px',
-        fontSize: '12px',
-        color: 'rgba(248,243,234,0.2)',
-      }}>
+      <p className="mt-8 text-xs text-white/20">
         © {new Date().getFullYear()} SolarDesk
       </p>
     </div>

@@ -1,8 +1,19 @@
 import Link from 'next/link';
+import Script from 'next/script';
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#0f172a] text-white font-sans antialiased">
+
+      {/* Live demo widget */}
+      <Script src="/embed.js?clientId=landing-demo" strategy="afterInteractive" />
+
+      {/* "Try the live demo" label above the FAB */}
+      <div className="pointer-events-none fixed bottom-[100px] right-4 z-[2147483646] flex flex-col items-end gap-1">
+        <div className="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-semibold text-amber-400 shadow-lg backdrop-blur-sm">
+          👇 Try the live demo
+        </div>
+      </div>
 
       {/* ── Nav ── */}
       <nav className="sticky top-0 z-50 border-b border-white/5 bg-[#0f172a]/90 backdrop-blur-md">
