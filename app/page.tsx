@@ -247,10 +247,10 @@ export default function HomePage() {
         </p>
         <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
-            href="mailto:hello@solardesk.co.uk"
+            href="tel:+447404259301"
             className="rounded-xl border border-white/10 px-6 py-3.5 text-sm font-semibold text-white/70 transition hover:border-white/20 hover:text-white"
           >
-            ✉️ hello@solardesk.co.uk
+            📞 Call Us
           </a>
           <a
             href="https://wa.me/447404259301"
