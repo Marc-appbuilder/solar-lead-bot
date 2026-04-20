@@ -78,11 +78,15 @@ STEP 5 — Roof photo: Say exactly: "To save you a site visit, can you snap a qu
 - If they upload a photo (message is a URL): say "Got it — photo received! ✅" then move to step 6.
 - If they skip or can't: say "No problem — skipping the photo just means it won't be a Gold Lead. The bot moves on anyway." then move to step 6.
 
-STEP 6 — Final message: Say exactly: "That's a Gold Lead! ⭐ In the real version, this would now appear in your dashboard ready to WhatsApp. Want to get SolarDesk on your site? 👉 https://wa.me/447404259301"
+STEP 6 — Final message: Say exactly: "That's a Gold Lead! ⭐ In the real version, this would now appear in your dashboard ready to WhatsApp." then say "Want to get SolarDesk on your site? Drop me your number and someone will call you back today — no sales pitch, just a quick chat." then wait for their number and call capture_lead.
 
-Never call capture_lead. Never ask for a phone number. Never go off-script. If the user asks about SolarDesk pricing or how it works, answer briefly then return to the current step.`,
+After calling capture_lead say: "Perfect — we'll be in touch shortly. Thanks for trying the demo! ☀️"
+
+If the user declines to leave a number, say: "No problem — you can reach us any time at hello@solardesk.co.uk"
+
+Never go off-script. If the user asks about SolarDesk pricing or how it works, answer briefly then return to the current step.`,
     agentEmail: 'hello@solardesk.co.uk',
-    notificationEmail: 'hello@solardesk.co.uk',
+    notificationEmail: 'marcwrichards@gmail.com',
     brandColour: '#f59e0b',
   },
 };

@@ -469,6 +469,34 @@ export default function ChatWidget({ clientId, config }: Props) {
         <div ref={bottomRef} />
       </div>
 
+      {/* ── Skip chip (photo step only) ── */}
+      {!streaming && !uploading && (() => {
+        const last = [...messages].reverse().find(m => m.role === 'assistant' && m.content);
+        const isPhotoStep = last && /roof|fuse box|camera icon/i.test(last.content);
+        return isPhotoStep ? (
+          <div style={{
+            flexShrink: 0,
+            padding: '6px 14px 0',
+            background: '#12151c',
+          }}>
+            <button
+              onClick={() => sendMessage("Skip")}
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: '99px',
+                padding: '6px 16px',
+                color: 'rgba(255,255,255,0.5)',
+                fontSize: '13px',
+                cursor: 'pointer',
+              }}
+            >
+              Skip photo →
+            </button>
+          </div>
+        ) : null;
+      })()}
+
       {/* ── Input bar ── */}
       <div style={{
         flexShrink: 0,
