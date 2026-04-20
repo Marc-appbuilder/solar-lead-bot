@@ -66,12 +66,12 @@ export default function HomePage() {
                 fix: 'SolarDesk answers instantly, every time — 2am or Sunday morning.',
               },
               {
-                problem: 'Wasting time on tyre-kickers?',
-                fix: 'We filter out renters and low bills before you pick up the phone.',
+                problem: 'Too many enquiries going nowhere?',
+                fix: 'SolarDesk qualifies every lead before it reaches you — so you only deal with the ones worth your time.',
               },
               {
-                problem: 'Driving 2 hours for a dead lead?',
-                fix: 'Only speak to homeowners with £150+ bills in your area.',
+                problem: 'Turning up to jobs that don\'t convert?',
+                fix: 'Know the bill size, ownership and roof setup before you even pick up the phone.',
               },
             ].map((item) => (
               <div
@@ -96,7 +96,7 @@ export default function HomePage() {
             How It Works
           </h2>
           <p className="mb-16 text-center text-base text-white/45">
-            Paste one line of code. That's it.
+            We handle the setup. You just start getting leads.
           </p>
           <div className="flex flex-col gap-6">
             {[
