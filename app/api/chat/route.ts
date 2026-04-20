@@ -104,7 +104,7 @@ function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): 
 async function sendLeadEmail(lead: LeadPayload, clientId: string) {
   const config = getClient(clientId);
   const { error } = await getResend().emails.send({
-    from: 'SolarDesk <leads@solardesk.co>',
+    from: 'SolarDesk <leads@solardesk.co.uk>',
     to: config.notificationEmail,
     subject: `New solar lead — ${config.name}`,
     html: buildHtml(lead, config.name, config.brandColour),
