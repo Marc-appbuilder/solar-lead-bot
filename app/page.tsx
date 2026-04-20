@@ -57,12 +57,12 @@ export default function HomePage() {
       <section className="border-y border-white/5 bg-[#0b1120] px-5 py-20">
         <div className="mx-auto max-w-5xl">
           <h2 className="mb-12 text-center text-2xl font-black tracking-tight sm:text-3xl">
-            Sound familiar?
+            The Problem With Solar Leads
           </h2>
           <div className="grid gap-5 sm:grid-cols-3">
             {[
               {
-                problem: 'Leads coming in after hours?',
+                problem: 'Missing enquiries while you\'re on a job?',
                 fix: 'SolarDesk answers instantly, every time — 2am or Sunday morning.',
               },
               {
@@ -102,8 +102,8 @@ export default function HomePage() {
             {[
               {
                 n: '1',
-                title: 'Bot captures the lead on your website',
-                body: 'A friendly chat widget opens the conversation the moment someone visits your site — day or night.',
+                title: 'Your site starts the conversation',
+                body: 'A friendly chat widget opens the moment someone visits your site — day or night, no missed enquiries.',
               },
               {
                 n: '2',
@@ -113,7 +113,7 @@ export default function HomePage() {
               {
                 n: '3',
                 title: 'Drops a Gold Lead into your dashboard',
-                body: 'Ready for you to WhatsApp with one tap. No login faff — just a phone in your pocket and leads waiting.',
+                body: 'Ready for you to WhatsApp with one tap. No faff — just leads waiting in your pocket.',
               },
             ].map((step) => (
               <div key={step.n} className="flex items-start gap-5">
@@ -240,7 +240,7 @@ export default function HomePage() {
       {/* ── Footer CTA ── */}
       <section className="border-t border-white/5 bg-[#0b1120] px-5 py-20 text-center">
         <h2 className="mb-4 text-3xl font-black tracking-tight sm:text-4xl">
-          Ready to stop losing leads?
+          Get set up today
         </h2>
         <p className="mx-auto mb-8 max-w-md text-base leading-relaxed text-white/50">
           We'll get you set up in 24 hours. No contracts, no tech headaches.
