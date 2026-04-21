@@ -28,6 +28,7 @@ interface Client {
   border_colour: string | null;
   widget_position: string | null;
   language: string | null;
+  bot_name: string | null;
 }
 
 interface Lead {
@@ -108,6 +109,9 @@ export default function AdminDashboard() {
   const [languageDraft, setLanguageDraft]   = useState<string>('english');
   const [languageSaving, setLanguageSaving] = useState(false);
   const [languageSaved, setLanguageSaved]   = useState(false);
+  const [botNameDraft, setBotNameDraft]     = useState<string>('');
+  const [botNameSaving, setBotNameSaving]   = useState(false);
+  const [botNameSaved, setBotNameSaved]     = useState(false);
 
   const fetchClients = useCallback(async () => {
     const res = await fetch('/api/clients');
@@ -132,6 +136,8 @@ export default function AdminDashboard() {
     setPositionSaved(false);
     setLanguageDraft(client.language ?? 'english');
     setLanguageSaved(false);
+    setBotNameDraft(client.bot_name ?? '');
+    setBotNameSaved(false);
     setInfoDraft({
       contact_name: client.contact_name ?? '',
       email: client.email ?? '',
@@ -224,6 +230,19 @@ export default function AdminDashboard() {
     setLanguageSaved(true);
     setClients(prev => prev.map(c => c.id === clientId ? { ...c, language: languageDraft } : c));
     setTimeout(() => setLanguageSaved(false), 2000);
+  }
+
+  async function saveBotName(clientId: string) {
+    setBotNameSaving(true);
+    await fetch(`/api/clients/${clientId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot_name: botNameDraft || null }),
+    });
+    setBotNameSaving(false);
+    setBotNameSaved(true);
+    setClients(prev => prev.map(c => c.id === clientId ? { ...c, bot_name: botNameDraft || null } : c));
+    setTimeout(() => setBotNameSaved(false), 2000);
   }
 
   async function saveInfo(clientId: string) {
@@ -743,6 +762,29 @@ export default function AdminDashboard() {
               }}
             >
               {languageSaving ? 'Saving…' : languageSaved ? '✓ Saved' : 'Save language'}
+            </button>
+          </div>
+
+          {/* Bot name */}
+          <div style={{ ...card, padding: '14px 16px' }}>
+            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginBottom: '4px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              Bot name
+            </div>
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)', marginBottom: '8px' }}>
+              Leave blank to use the default (Ray)
+            </div>
+            <input
+              style={{ ...input, marginBottom: '10px' }}
+              placeholder="Ray"
+              value={botNameDraft}
+              onChange={e => setBotNameDraft(e.target.value)}
+            />
+            <button
+              onClick={() => saveBotName(selected.id)}
+              disabled={botNameSaving}
+              style={{ ...ghostBtn, width: '100%', color: botNameSaved ? '#34d399' : 'rgba(255,255,255,0.6)' }}
+            >
+              {botNameSaving ? 'Saving…' : botNameSaved ? '✓ Saved' : 'Save bot name'}
             </button>
           </div>
 

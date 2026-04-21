@@ -371,7 +371,7 @@ export default function ChatWidget({ clientId, config }: Props) {
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}>
-            {config.name}
+            {config.botName ?? 'Ray'}
           </p>
           <p style={{ margin: 0, fontSize: '11px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.3 }}>Virtual Assistant</p>
         </div>
