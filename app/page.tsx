@@ -39,11 +39,11 @@ export default function HomePage() {
           Built for UK solar installers
         </div>
         <h1 className="mb-6 text-5xl font-black leading-[1.06] tracking-tight sm:text-6xl lg:text-7xl">
-          Never Miss a<br />
-          <span className="text-amber-400">Solar Lead</span> Again
+          Every Solar Enquiry,<br />
+          <span className="text-amber-400">Answered</span>
         </h1>
         <p className="mx-auto mb-10 max-w-xl text-lg text-white/55 sm:text-xl">
-          SolarDesk qualifies your leads 24/7 — while you're on the roof.
+          A chat widget that qualifies your leads while you're on the roof.
         </p>
         <a
           href="#how-it-works"
@@ -57,21 +57,21 @@ export default function HomePage() {
       <section className="border-y border-white/5 bg-[#0b1120] px-5 py-20">
         <div className="mx-auto max-w-5xl">
           <h2 className="mb-12 text-center text-2xl font-black tracking-tight sm:text-3xl">
-            The Problem With Solar Leads
+            Why Solar Installers Use SolarDesk
           </h2>
           <div className="grid gap-5 sm:grid-cols-3">
             {[
               {
                 problem: 'Missing enquiries while you\'re on a job?',
-                fix: 'SolarDesk answers instantly, every time — 2am or Sunday morning.',
+                fix: 'SolarDesk picks up while you\'re busy. Every enquiry gets answered straight away.',
               },
               {
                 problem: 'Too many enquiries going nowhere?',
-                fix: 'SolarDesk qualifies every lead before it reaches you — so you only deal with the ones worth your time.',
+                fix: 'Every lead gets qualified before it reaches you. You only see the ones worth calling back.',
               },
               {
                 problem: 'Turning up to jobs that don\'t convert?',
-                fix: 'Know the bill size, ownership and roof setup before you even pick up the phone.',
+                fix: 'You\'ll know their bill, whether they own the home, and their roof situation before you call.',
               },
             ].map((item) => (
               <div
@@ -108,12 +108,12 @@ export default function HomePage() {
               {
                 n: '2',
                 title: 'Qualifies everything that matters',
-                body: 'Postcode, home ownership, monthly bill size, and a roof photo — all collected before you even know the name.',
+                body: 'Postcode, home ownership, monthly bill size, and an optional roof photo — all collected before you even know the name.',
               },
               {
                 n: '3',
                 title: 'Drops a Gold Lead into your dashboard',
-                body: 'Ready for you to WhatsApp with one tap. No faff — just leads waiting in your pocket.',
+                body: 'Ready to call or WhatsApp with one tap, straight from your dashboard.',
               },
             ].map((step) => (
               <div key={step.n} className="flex items-start gap-5">
