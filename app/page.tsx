@@ -205,12 +205,13 @@ export default function HomePage() {
                 <span className="text-6xl font-black text-amber-400">£99</span>
                 <span className="mb-3 text-lg text-white/40">/month</span>
               </div>
-              <p className="text-sm text-white/40">Everything you need to stop losing leads</p>
+              <p className="mt-2 text-sm text-white/30">+ £249 one-off setup fee</p>
+              <p className="mt-2 text-sm text-white/40">Everything you need to stop losing leads</p>
             </div>
             <div className="px-8 py-8">
               <ul className="mb-8 space-y-3 text-left">
                 {[
-                  'No setup fee',
+                  'One-off £249 setup — then £99/month',
                   'Cancel anytime',
                   'Live within 24 hours',
                   'Gold lead qualification',
@@ -230,7 +231,7 @@ export default function HomePage() {
                 rel="noreferrer"
                 className="block w-full rounded-xl bg-amber-400 py-4 text-center text-base font-bold text-[#0f172a] transition hover:bg-amber-300"
               >
-                💬 Get Started on WhatsApp
+                Get Started on WhatsApp
               </a>
             </div>
           </div>
