@@ -127,6 +127,11 @@ export default function HomePage() {
                 title: 'Drops a Gold Lead into your dashboard',
                 body: 'Ready to call or WhatsApp with one tap, straight from your dashboard.',
               },
+              {
+                n: '4',
+                title: 'It hits your inbox instantly',
+                body: 'Your lead arrives by email and dashboard notification the moment it\'s captured. One tap to call or WhatsApp. No CRM needed, no chasing.',
+              },
             ].map((step) => (
               <div key={step.n} className="flex items-start gap-5">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-amber-400/40 bg-amber-400/10 text-base font-black text-amber-400">
@@ -231,7 +236,9 @@ export default function HomePage() {
                 <span className="mb-3 text-lg text-white/40">/month</span>
               </div>
               <p className="mt-2 text-sm text-white/30">+ £249 one-off setup fee</p>
-              <p className="mt-2 text-sm text-white/40">Everything you need to stop losing leads</p>
+              <p className="mx-auto mt-4 max-w-xs text-xs leading-relaxed text-white/30">
+                The average cost per solar lead from Google Ads is £40–80. At £197/month you need just 3 leads to break even.
+              </p>
             </div>
             <div className="px-8 py-8">
               <ul className="mb-8 space-y-3 text-left">
@@ -263,11 +270,41 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── FAQ ── */}
+      <section className="border-y border-white/5 bg-[#0b1120] px-5 py-24">
+        <div className="mx-auto max-w-2xl">
+          <h2 className="mb-12 text-center text-2xl font-black tracking-tight sm:text-3xl">
+            Common questions
+          </h2>
+          <div className="flex flex-col divide-y divide-white/5">
+            {[
+              {
+                q: 'What if the AI says something wrong?',
+                a: 'You control all responses. We set SolarDesk up around your business and you can request changes anytime.',
+              },
+              {
+                q: 'What about GDPR and roof photos?',
+                a: 'Photos are stored securely and deleted on request. Fully GDPR compliant.',
+              },
+              {
+                q: 'How does the lead reach me?',
+                a: 'Instantly. It hits your dashboard and your inbox the moment it\'s captured. One tap to call or WhatsApp directly from your dashboard. No CRM needed.',
+              },
+            ].map((item) => (
+              <div key={item.q} className="py-7">
+                <p className="mb-3 font-bold text-white">{item.q}</p>
+                <p className="text-sm leading-relaxed text-white/50">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Booking ── */}
       <section className="border-y border-white/5 bg-[#0f172a] px-5 py-24">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-4 inline-block rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5 text-sm font-semibold text-amber-400">
-            Free demo call
+            Book 15 minutes
           </div>
           <h2 className="mb-4 text-3xl font-black tracking-tight sm:text-4xl">
             See it live. Book 15 minutes.
