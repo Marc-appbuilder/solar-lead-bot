@@ -131,61 +131,74 @@ export default function HomePage() {
       </section>
 
       {/* ── Gold Lead ── */}
-      <section className="border-y border-white/5 bg-[#0b1120] px-5 py-24">
-        <div className="mx-auto max-w-4xl">
-          <div className="mb-4 text-center text-sm font-semibold uppercase tracking-widest text-amber-400">
+      <section className="relative overflow-hidden border-y border-amber-400/10 bg-[#0a0c10] px-5 py-28">
+        {/* Glow backdrop */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="h-[500px] w-[700px] rounded-full bg-amber-400/5 blur-3xl" />
+        </div>
+
+        <div className="relative mx-auto max-w-5xl">
+          <div className="mb-5 text-center text-sm font-bold uppercase tracking-widest text-amber-400">
             The Gold Lead
           </div>
-          <h2 className="mb-4 text-center text-3xl font-black tracking-tight sm:text-4xl">
-            You know it's real before you call
+          <h2 className="mb-6 text-center text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+            You know it's worth your time<br />
+            <span className="text-amber-400">before you pick up the phone</span>
           </h2>
-          <p className="mx-auto mb-14 max-w-xl text-center text-base leading-relaxed text-white/50">
-            A Gold Lead means: they own the home, pay £150+ a month, are in your service area, and have uploaded a roof photo.
+          <p className="mx-auto mb-14 max-w-lg text-center text-lg text-white/40">
+            Ray only awards a Gold Lead when all four boxes are ticked.
           </p>
 
+          {/* Criteria grid */}
+          <div className="mb-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { label: 'Homeowner', detail: 'Confirmed owner of the property' },
+              { label: '£150+ bill', detail: 'Monthly electricity spend qualifies' },
+              { label: 'Service area', detail: 'Postcode checked at the start' },
+              { label: 'Roof photo', detail: 'Uploaded before they give their number' },
+            ].map((c) => (
+              <div key={c.label} className="rounded-2xl border border-amber-400/15 bg-amber-400/5 px-5 py-6 text-center">
+                <div className="mb-2 text-2xl font-black text-amber-400">✓</div>
+                <div className="mb-1 text-base font-black text-white">{c.label}</div>
+                <div className="text-xs leading-relaxed text-white/40">{c.detail}</div>
+              </div>
+            ))}
+          </div>
+
           {/* Mock lead card */}
-          <div className="mx-auto max-w-sm overflow-hidden rounded-2xl border border-amber-400/20 bg-[#0f172a] shadow-[0_0_60px_rgba(245,158,11,0.08)]">
-            {/* Card header */}
+          <div className="mx-auto max-w-sm overflow-hidden rounded-2xl border border-amber-400/25 bg-[#0f172a] shadow-[0_0_80px_rgba(245,158,11,0.12)]">
             <div className="flex items-center justify-between border-b border-white/5 px-5 py-4">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-base font-bold">07911 234567</span>
                   <span className="rounded-full bg-amber-400/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-400">
-                    ⭐ Gold
+                    Gold
                   </span>
                 </div>
-                <p className="mt-0.5 text-xs text-white/30">Just now · Steve's Solar</p>
+                <p className="mt-0.5 text-xs text-white/30">Just now · Sunrise Solar</p>
               </div>
               <span className="rounded-full bg-[#1e3a5f] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#60a5fa]">
                 New
               </span>
             </div>
-
-            {/* Card details */}
             <div className="flex flex-wrap gap-2 px-5 py-4">
               {[
                 { label: 'Postcode', value: 'BH12 4AB' },
-                { label: 'Bill',     value: '£250+' },
-                { label: 'Owner',    value: 'Yes' },
+                { label: 'Bill', value: '£250+' },
+                { label: 'Owner', value: 'Yes' },
               ].map((d) => (
                 <div key={d.label} className="rounded-lg bg-white/4 px-3 py-2 text-xs">
                   <span className="text-white/30">{d.label} </span>
                   <span className="font-semibold text-white">{d.value}</span>
                 </div>
               ))}
-              <div className="flex items-center gap-1.5 rounded-lg bg-white/4 px-3 py-2 text-xs font-semibold text-amber-400">
-                📷 Roof photo
+              <div className="flex items-center gap-1.5 rounded-lg bg-amber-400/10 px-3 py-2 text-xs font-semibold text-amber-400">
+                Roof photo
               </div>
             </div>
-
-            {/* Action buttons */}
             <div className="grid grid-cols-2 gap-2 px-5 pb-5">
-              <button className="flex items-center justify-center gap-2 rounded-xl bg-[#1e3a5f] py-3 text-sm font-semibold text-[#60a5fa]">
-                📞 Call
-              </button>
-              <button className="flex items-center justify-center gap-2 rounded-xl bg-[#0a2e1a] py-3 text-sm font-semibold text-[#34d399]">
-                💬 WhatsApp
-              </button>
+              <button className="rounded-xl bg-[#1e3a5f] py-3 text-sm font-semibold text-[#60a5fa]">Call</button>
+              <button className="rounded-xl bg-[#0a2e1a] py-3 text-sm font-semibold text-[#34d399]">WhatsApp</button>
             </div>
           </div>
         </div>
@@ -202,7 +215,7 @@ export default function HomePage() {
           <div className="overflow-hidden rounded-2xl border border-amber-400/25 bg-[#0b1120]">
             <div className="border-b border-white/5 bg-amber-400/5 px-8 py-8">
               <div className="mb-1 flex items-end justify-center gap-1">
-                <span className="text-6xl font-black text-amber-400">£99</span>
+                <span className="text-6xl font-black text-amber-400">£197</span>
                 <span className="mb-3 text-lg text-white/40">/month</span>
               </div>
               <p className="mt-2 text-sm text-white/30">+ £249 one-off setup fee</p>
@@ -211,7 +224,7 @@ export default function HomePage() {
             <div className="px-8 py-8">
               <ul className="mb-8 space-y-3 text-left">
                 {[
-                  'One-off £249 setup — then £99/month',
+                  'One-off £249 setup — then £197/month',
                   'Cancel anytime',
                   'Live within 24 hours',
                   'Gold lead qualification',
@@ -244,24 +257,16 @@ export default function HomePage() {
           Get set up today
         </h2>
         <p className="mx-auto mb-8 max-w-md text-base leading-relaxed text-white/50">
-          We'll get you set up in 24 hours. No contracts, no tech headaches.
+          The SolarDesk team will have you live within 24 hours. No contracts, no tech headaches.
         </p>
-        <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <a
-            href="tel:+447404259301"
-            className="rounded-xl border border-white/10 px-6 py-3.5 text-sm font-semibold text-white/70 transition hover:border-white/20 hover:text-white"
-          >
-            📞 Call Us
-          </a>
-          <a
-            href="https://wa.me/447404259301"
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-xl bg-[#0a2e1a] px-6 py-3.5 text-sm font-semibold text-[#34d399] transition hover:bg-[#0f3d22]"
-          >
-            💬 WhatsApp Us
-          </a>
-        </div>
+        <a
+          href="https://wa.me/447404259301"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-block rounded-xl bg-amber-400 px-10 py-4 text-base font-bold text-[#0f172a] shadow-[0_0_40px_rgba(245,158,11,0.3)] transition hover:bg-amber-300"
+        >
+          Get Started
+        </a>
       </section>
 
       {/* ── Footer ── */}
