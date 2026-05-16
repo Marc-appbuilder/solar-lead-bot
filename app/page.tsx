@@ -9,7 +9,22 @@ export default function HomePage() {
       <Script src="/embed.js?clientId=landing-demo" strategy="afterInteractive" />
 
       {/* Cal.com embed */}
-      <Script src="https://cal.com/embed.js" strategy="afterInteractive" />
+      <Script
+        src="https://app.cal.com/embed/embed.js"
+        strategy="afterInteractive"
+        onLoad={() => {
+          // @ts-expect-error Cal global
+          const Cal = window.Cal;
+          if (!Cal) return;
+          Cal('init', 'solardesk-demo', { origin: 'https://app.cal.com' });
+          Cal.ns['solardesk-demo']('inline', {
+            elementOrSelector: '#my-cal-inline-solardesk-demo',
+            config: { layout: 'month_view', useSlotsViewOnSmallScreen: 'true' },
+            calLink: 'vaughanai/solardesk-demo',
+          });
+          Cal.ns['solardesk-demo']('ui', { hideEventTypeDetails: false, layout: 'month_view' });
+        }}
+      />
 
       {/* "Try the live demo" label above the FAB */}
       <div className="pointer-events-none fixed bottom-[100px] right-4 z-[2147483646] flex flex-col items-end gap-1">
@@ -267,10 +282,9 @@ export default function HomePage() {
             We'll show you SolarDesk live — and how Gold Leads work in practice.
           </p>
           <div
-            data-cal-link="vaughanai/solar-desk"
-            data-cal-config='{"layout":"month_view","theme":"dark"}'
-            style={{ minHeight: '500px' }}
+            id="my-cal-inline-solardesk-demo"
             className="overflow-hidden rounded-2xl border border-white/5"
+            style={{ width: '100%', minHeight: '600px', overflow: 'scroll' }}
           />
         </div>
       </section>
