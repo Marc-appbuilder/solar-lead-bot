@@ -8,6 +8,9 @@ export default function HomePage() {
       {/* Live demo widget */}
       <Script src="/embed.js?clientId=landing-demo" strategy="afterInteractive" />
 
+      {/* Cal.com embed */}
+      <Script src="https://cal.com/embed.js" strategy="afterInteractive" />
+
       {/* "Try the live demo" label above the FAB */}
       <div className="pointer-events-none fixed bottom-[100px] right-4 z-[2147483646] flex flex-col items-end gap-1">
         <div className="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-semibold text-amber-400 shadow-lg backdrop-blur-sm">
@@ -248,6 +251,27 @@ export default function HomePage() {
               </a>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── Booking ── */}
+      <section className="border-y border-white/5 bg-[#0f172a] px-5 py-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mb-4 inline-block rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5 text-sm font-semibold text-amber-400">
+            Free demo call
+          </div>
+          <h2 className="mb-4 text-3xl font-black tracking-tight sm:text-4xl">
+            See it live. Book 15 minutes.
+          </h2>
+          <p className="mx-auto mb-12 max-w-md text-base leading-relaxed text-white/50">
+            We'll show you SolarDesk live — and how Gold Leads work in practice.
+          </p>
+          <div
+            data-cal-link="vaughanai/solar-desk"
+            data-cal-config='{"layout":"month_view","theme":"dark"}'
+            style={{ minHeight: '500px' }}
+            className="overflow-hidden rounded-2xl border border-white/5"
+          />
         </div>
       </section>
 
