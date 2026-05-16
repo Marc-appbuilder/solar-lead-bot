@@ -15,7 +15,7 @@ export default function HomePage() {
         Cal.ns["solardesk-demo"]("inline", {
           elementOrSelector:"#my-cal-inline-solardesk-demo",
           config: {"layout":"month_view","useSlotsViewOnSmallScreen":"true"},
-          calLink: "vaughanai/solardesk-demo",
+          calLink: "gladetech/solardesk-demo",
         });
         Cal.ns["solardesk-demo"]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
       `}</Script>
