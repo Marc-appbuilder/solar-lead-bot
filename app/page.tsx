@@ -275,6 +275,43 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Founder ── */}
+      <section className="border-y border-white/5 bg-[#0b1120] px-5 py-24">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="mb-12 text-2xl font-black tracking-tight sm:text-3xl">
+            Enterprise thinking. Personal service.
+          </h2>
+          <div className="overflow-hidden rounded-2xl border border-white/6 bg-[#0f172a] p-8 text-left sm:flex sm:gap-8">
+            <div className="mb-6 flex shrink-0 justify-center sm:mb-0">
+              <img
+                src="https://gladetech.uk/marc.jpeg"
+                alt="Marc Richards"
+                className="h-24 w-24 rounded-full object-cover"
+                style={{ objectPosition: 'center 20%' }}
+              />
+            </div>
+            <div>
+              <p className="mb-0.5 text-base font-black text-white">Marc Richards</p>
+              <p className="mb-5 text-sm text-white/40">
+                Founder,{' '}
+                <a
+                  href="https://gladetech.uk"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-amber-400 hover:underline"
+                >
+                  Glade Tech
+                </a>
+                {' '}· Poole, Dorset
+              </p>
+              <p className="text-sm leading-relaxed text-white/55">
+                SolarDesk is built by the team at Glade Tech, a software company in Poole, Dorset. We also build VaughanAI — a live AI assistant already generating leads for UK estate agents. With a background building production systems at JPMorgan Chase, we bring enterprise-grade reliability to the solar industry.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Footer CTA ── */}
       <section className="border-t border-white/5 bg-[#0b1120] px-5 py-20 text-center">
         <h2 className="mb-4 text-3xl font-black tracking-tight sm:text-4xl">
