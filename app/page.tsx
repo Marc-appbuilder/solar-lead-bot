@@ -365,14 +365,22 @@ export default function HomePage() {
         <p className="mx-auto mb-8 max-w-md text-base leading-relaxed text-white/50">
           The SolarDesk team will have you live within 24 hours. No contracts, no tech headaches.
         </p>
-        <a
-          href="https://wa.me/447404259301"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-block rounded-xl bg-amber-400 px-10 py-4 text-base font-bold text-[#0f172a] shadow-[0_0_40px_rgba(245,158,11,0.3)] transition hover:bg-amber-300"
-        >
-          Get Started
-        </a>
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <a
+            href="https://wa.me/447404259301"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-block rounded-xl bg-amber-400 px-10 py-4 text-base font-bold text-[#0f172a] shadow-[0_0_40px_rgba(245,158,11,0.3)] transition hover:bg-amber-300"
+          >
+            Get Started on WhatsApp
+          </a>
+          <a
+            href="mailto:marc@gladetech.uk"
+            className="inline-block rounded-xl border border-white/15 px-10 py-4 text-base font-semibold text-white/60 transition hover:border-white/30 hover:text-white/80"
+          >
+            Email Us
+          </a>
+        </div>
       </section>
 
       {/* ── Footer ── */}
