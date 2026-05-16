@@ -9,22 +9,16 @@ export default function HomePage() {
       <Script src="/embed.js?clientId=landing-demo" strategy="afterInteractive" />
 
       {/* Cal.com embed */}
-      <Script
-        src="https://app.cal.com/embed/embed.js"
-        strategy="afterInteractive"
-        onLoad={() => {
-          // @ts-expect-error Cal global
-          const Cal = window.Cal;
-          if (!Cal) return;
-          Cal('init', 'solardesk-demo', { origin: 'https://app.cal.com' });
-          Cal.ns['solardesk-demo']('inline', {
-            elementOrSelector: '#my-cal-inline-solardesk-demo',
-            config: { layout: 'month_view', useSlotsViewOnSmallScreen: 'true' },
-            calLink: 'vaughanai/solardesk-demo',
-          });
-          Cal.ns['solardesk-demo']('ui', { hideEventTypeDetails: false, layout: 'month_view' });
-        }}
-      />
+      <Script id="cal-inline-embed" strategy="afterInteractive">{`
+        (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+        Cal("init", "solardesk-demo", {origin:"https://app.cal.com"});
+        Cal.ns["solardesk-demo"]("inline", {
+          elementOrSelector:"#my-cal-inline-solardesk-demo",
+          config: {"layout":"month_view","useSlotsViewOnSmallScreen":"true"},
+          calLink: "vaughanai/solardesk-demo",
+        });
+        Cal.ns["solardesk-demo"]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
+      `}</Script>
 
       {/* "Try the live demo" label above the FAB */}
       <div className="pointer-events-none fixed bottom-[100px] right-4 z-[2147483646] flex flex-col items-end gap-1">
