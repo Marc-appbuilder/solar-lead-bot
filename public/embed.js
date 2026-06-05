@@ -51,7 +51,8 @@
     '@keyframes ea-breathe{0%,100%{box-shadow:var(--ea-glow-rest)}50%{box-shadow:var(--ea-glow-peak)}}' +
     /* Radar / sonar pulse — emanates from circle outward */
     '@keyframes ea-pulse{0%{transform:scale(1);opacity:0.7}100%{transform:scale(2.6);opacity:0}}' +
-    '@keyframes ea-teaser-in{from{opacity:0}to{opacity:1}}';
+    '@keyframes ea-teaser-in{from{opacity:0}to{opacity:1}}' +
+    '@keyframes ea-sun-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
   document.head.appendChild(styleEl);
 
   /* ── 5. FAB wrapper ─────────────────────────────────────────────────────── */
@@ -357,6 +358,9 @@
   function openFab() {
     isOpen = true;
     teaser.style.display = 'none';
+    /* Sun burst — quick scale flare before chat opens */
+    fab.style.transform = 'scale(1.28)';
+    setTimeout(function () { fab.style.transform = ''; }, 180);
     if (_teaserTimer) { clearTimeout(_teaserTimer); _teaserTimer = null; }
     if (_dragged && !isMobile()) { _repoContainer(); } else { applyContainerSize(); }
     container.style.display   = 'block';
@@ -399,13 +403,20 @@
     /* Start breathing glow (delayed to after entrance) */
     fab.style.animation = 'ea-breathe 3.5s ease-in-out 2.6s infinite';
 
-    /* Chat icon */
+    /* Sun icon */
     _chatInner =
-      '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 32 32" fill="none">' +
-        '<path d="M16 3C9.373 3 4 7.925 4 14c0 3.13 1.387 5.958 3.636 8.003L6 29l6.5-3.25A13.6 13.6 0 0 0 16 26c6.627 0 12-4.925 12-11S22.627 3 16 3Z" fill="white" opacity="0.95"/>' +
-        '<circle cx="11" cy="14" r="1.5" fill="' + hex + '" opacity="0.9"/>' +
-        '<circle cx="16" cy="14" r="1.5" fill="' + hex + '" opacity="0.9"/>' +
-        '<circle cx="21" cy="14" r="1.5" fill="' + hex + '" opacity="0.9"/>' +
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36" style="animation:ea-sun-spin 20s linear infinite;transform-origin:50% 50%;">' +
+        '<g transform="translate(32,32)">' +
+          '<rect x="-2.5" y="-26" width="5" height="12" rx="2.5" fill="white" opacity="0.90"/>' +
+          '<rect x="-2.5" y="-26" width="5" height="12" rx="2.5" fill="white" opacity="0.90" transform="rotate(45)"/>' +
+          '<rect x="-2.5" y="-26" width="5" height="12" rx="2.5" fill="white" opacity="0.90" transform="rotate(90)"/>' +
+          '<rect x="-2.5" y="-26" width="5" height="12" rx="2.5" fill="white" opacity="0.90" transform="rotate(135)"/>' +
+          '<rect x="-2.5" y="-26" width="5" height="12" rx="2.5" fill="white" opacity="0.90" transform="rotate(180)"/>' +
+          '<rect x="-2.5" y="-26" width="5" height="12" rx="2.5" fill="white" opacity="0.90" transform="rotate(225)"/>' +
+          '<rect x="-2.5" y="-26" width="5" height="12" rx="2.5" fill="white" opacity="0.90" transform="rotate(270)"/>' +
+          '<rect x="-2.5" y="-26" width="5" height="12" rx="2.5" fill="white" opacity="0.90" transform="rotate(315)"/>' +
+          '<circle r="11" fill="white" opacity="0.97"/>' +
+        '</g>' +
       '</svg>';
 
     fab.innerHTML = _chatInner;
