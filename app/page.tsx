@@ -7,7 +7,9 @@ export default function HomePage() {
       {/* ── Nav ── */}
       <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <img src="/logo.svg" alt="SolarDesk" className="h-14 w-auto" />
+          <span className="text-base font-black tracking-tight text-[#0F172A]">
+            ☀️ SolarDesk
+          </span>
           <Link
             href="/login"
             className="text-sm text-gray-400 transition hover:text-gray-600"
