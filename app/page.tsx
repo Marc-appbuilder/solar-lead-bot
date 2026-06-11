@@ -26,9 +26,8 @@ export default function HomePage() {
             For UK solar installers
           </p>
           <h1 className="mb-8 text-4xl font-black leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
-            While you're installing solar,<br />
-            SolarDesk is answering<br />
-            your enquiries.
+            Capture solar leads.<br />
+            While you're on the roof.
           </h1>
           <p className="mb-10 max-w-xl text-lg leading-relaxed text-gray-400">
             SolarDesk answers questions, qualifies leads and captures opportunities while you're busy doing the work. No missed enquiries. No repetitive admin.
