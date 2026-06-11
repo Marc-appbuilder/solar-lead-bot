@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 495 230">
+  <defs>
+    <!-- Arc gradient: yellow → amber → coral, upper-right to lower-left -->
+    <linearGradient id="arcG" gradientUnits="userSpaceOnUse" x1="174" y1="64" x2="52" y2="174">
+      <stop offset="0%"   stop-color="#FFD700"/>
+      <stop offset="28%"  stop-color="#FFA500"/>
+      <stop offset="62%"  stop-color="#FF5533"/>
+      <stop offset="100%" stop-color="#FF3311"/>
+    </linearGradient>
+    <!-- Ray gradient: same direction but wider span -->
+    <linearGradient id="rayG" gradientUnits="userSpaceOnUse" x1="174" y1="8" x2="14" y2="175">
+      <stop offset="0%"   stop-color="#FFD700"/>
+      <stop offset="30%"  stop-color="#FFA500"/>
+      <stop offset="65%"  stop-color="#FF5533"/>
+      <stop offset="100%" stop-color="#FF3311"/>
+    </linearGradient>
+    <!-- Solar panel background gradient -->
+    <linearGradient id="panelBg" x1="0%" y1="0%" x2="10%" y2="100%">
+      <stop offset="0%"   stop-color="#233da0"/>
+      <stop offset="100%" stop-color="#172e80"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ── Main arc: 270° C-shape, opening to the right ── -->
+  <!-- cx=123, cy=115, r=72  |  start 315° → end 45°, counterclockwise -->
+  <path
+    d="M 174,64 A 72,72 0 1,0 174,166"
+    fill="none"
+    stroke="url(#arcG)"
+    stroke-width="13"
+    stroke-linecap="round"
+  />
+
+  <!-- ── Sun rays: 8 narrow triangles radiating from the arc ── -->
+  <!-- tip_r=110, base_r=70, half-angle=3° -->
+
+  <!-- 268° — near top (12 o'clock) -->
+  <polygon points="119.2,5.1  121.8,45.0  116.9,45.3"  fill="url(#rayG)"/>
+  <!-- 248° — upper-left -->
+  <polygon points="81.8,13.0  100.2,48.8  93.4,51.6"   fill="url(#rayG)"/>
+  <!-- 230° — upper-left -->
+  <polygon points="52.3,30.7  80.9,59.1   75.3,63.8"   fill="url(#rayG)"/>
+  <!-- 213° — left-upper -->
+  <polygon points="30.7,55.1  66.4,73.9   62.4,80.0"   fill="url(#rayG)"/>
+  <!-- 197° — left -->
+  <polygon points="17.8,82.8  57.2,91.1   55.1,98.1"   fill="url(#rayG)"/>
+  <!-- 180° — 9 o'clock -->
+  <polygon points="13.0,115.0 53.1,111.3  53.1,118.7"  fill="url(#rayG)"/>
+  <!-- 163° — lower-left -->
+  <polygon points="17.8,147.2 55.1,131.9  57.2,138.9"  fill="url(#rayG)"/>
+  <!-- 145° — lower-left -->
+  <polygon points="32.9,178.1 63.6,152.1  67.8,158.1"  fill="url(#rayG)"/>
+
+  <!-- ── Solar panels: navy grid at bottom-left of circle ── -->
+  <g transform="translate(95,150) rotate(-20,37,15)">
+    <rect x="0" y="0" width="75" height="31" fill="url(#panelBg)" rx="1"/>
+    <!-- Major gap lines between panel columns -->
+    <line x1="18"  y1="0"    x2="18"  y2="31"   stroke="#0d1f60" stroke-width="2"/>
+    <line x1="37"  y1="0"    x2="37"  y2="31"   stroke="#0d1f60" stroke-width="2"/>
+    <line x1="56"  y1="0"    x2="56"  y2="31"   stroke="#0d1f60" stroke-width="2"/>
+    <!-- Major gap lines between panel rows -->
+    <line x1="0"   y1="10.5" x2="75"  y2="10.5" stroke="#0d1f60" stroke-width="2"/>
+    <line x1="0"   y1="21"   x2="75"  y2="21"   stroke="#0d1f60" stroke-width="2"/>
+    <!-- Minor cell grid lines (vertical thirds per column) -->
+    <line x1="6"   y1="0" x2="6"   y2="31" stroke="#3256b5" stroke-width="0.6"/>
+    <line x1="12"  y1="0" x2="12"  y2="31" stroke="#3256b5" stroke-width="0.6"/>
+    <line x1="24"  y1="0" x2="24"  y2="31" stroke="#3256b5" stroke-width="0.6"/>
+    <line x1="30"  y1="0" x2="30"  y2="31" stroke="#3256b5" stroke-width="0.6"/>
+    <line x1="43"  y1="0" x2="43"  y2="31" stroke="#3256b5" stroke-width="0.6"/>
+    <line x1="49"  y1="0" x2="49"  y2="31" stroke="#3256b5" stroke-width="0.6"/>
+    <line x1="62"  y1="0" x2="62"  y2="31" stroke="#3256b5" stroke-width="0.6"/>
+    <line x1="68"  y1="0" x2="68"  y2="31" stroke="#3256b5" stroke-width="0.6"/>
+    <!-- Minor cell grid lines (horizontal thirds per row) -->
+    <line x1="0" y1="3.5"  x2="75" y2="3.5"  stroke="#3256b5" stroke-width="0.6"/>
+    <line x1="0" y1="7"    x2="75" y2="7"    stroke="#3256b5" stroke-width="0.6"/>
+    <line x1="0" y1="14"   x2="75" y2="14"   stroke="#3256b5" stroke-width="0.6"/>
+    <line x1="0" y1="17.5" x2="75" y2="17.5" stroke="#3256b5" stroke-width="0.6"/>
+    <line x1="0" y1="24.5" x2="75" y2="24.5" stroke="#3256b5" stroke-width="0.6"/>
+    <line x1="0" y1="28"   x2="75" y2="28"   stroke="#3256b5" stroke-width="0.6"/>
+  </g>
+
+  <!-- ── SolarDesk wordmark ── -->
+  <text
+    x="210"
+    y="129"
+    font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
+    font-weight="900"
+    font-size="52"
+    fill="#1a2f7a"
+  >SolarDesk</text>
+</svg>
