@@ -11,28 +11,33 @@ export default function HomePage() {
       <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
-            {/* Hand-drawn style sun icon */}
-            <svg viewBox="0 0 44 44" width="40" height="40" fill="none" aria-hidden="true">
+            {/* Hand-crafted sun — irregular rays, warm gradient, organic circle */}
+            <svg viewBox="0 0 44 44" width="38" height="38" fill="none" aria-hidden="true">
               <defs>
-                <radialGradient id="sunGrd" cx="38%" cy="30%" r="65%">
-                  <stop offset="0%"   stopColor="#FDE68A"/>
-                  <stop offset="45%"  stopColor="#FBBF24"/>
+                <radialGradient id="sg" cx="40%" cy="35%" r="62%">
+                  <stop offset="0%"   stopColor="#FEF3C7"/>
+                  <stop offset="40%"  stopColor="#FBBF24"/>
                   <stop offset="100%" stopColor="#D97706"/>
                 </radialGradient>
               </defs>
-              {/* 8 rays — slightly curved paths for a hand-drawn feel */}
-              <path d="M22,10.5 Q22.8,6.5 22,2"        stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
-              <path d="M30.1,13.9 Q34,10.5 37.5,6.5"   stroke="#F59E0B" strokeWidth="2"   strokeLinecap="round" fill="none"/>
-              <path d="M33.5,22 Q37.5,22.6 42,22"      stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
-              <path d="M30.1,30.1 Q34,34.5 37.5,37.5"  stroke="#F59E0B" strokeWidth="2"   strokeLinecap="round" fill="none"/>
-              <path d="M22,33.5 Q21.2,37.8 22,42"      stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
-              <path d="M13.9,30.1 Q10,34.5 6.5,37.5"   stroke="#F59E0B" strokeWidth="2"   strokeLinecap="round" fill="none"/>
-              <path d="M10.5,22 Q6.5,21.4 2,22"        stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
-              <path d="M13.9,13.9 Q10,10.5 6.5,6.5"    stroke="#F59E0B" strokeWidth="2"   strokeLinecap="round" fill="none"/>
-              {/* Sun body with warm radial gradient */}
-              <circle cx="22" cy="22" r="9.5" fill="url(#sunGrd)"/>
+              {/* 10 rays at intentionally non-uniform angles & lengths */}
+              <path d="M21.7,13 Q20.8,7 21.3,1.5"      stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+              <path d="M26.5,14.2 Q28,11 29.5,9"        stroke="#F59E0B" strokeWidth="1.7" strokeLinecap="round" fill="none"/>
+              <path d="M29.6,17.2 Q34,14 37.3,12.5"     stroke="#F59E0B" strokeWidth="2.0" strokeLinecap="round" fill="none"/>
+              <path d="M30.8,20.7 Q34.5,20 37.6,19.8"   stroke="#F59E0B" strokeWidth="1.7" strokeLinecap="round" fill="none"/>
+              <path d="M30.2,25.8 Q34,27.5 37.4,29.2"   stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+              <path d="M25.8,30.2 Q28,35 30,39.2"       stroke="#F59E0B" strokeWidth="2.0" strokeLinecap="round" fill="none"/>
+              <path d="M19.7,30.7 Q18.5,34 18.1,36.5"   stroke="#F59E0B" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
+              <path d="M14.6,27.2 Q10.5,30 7.3,32.3"    stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+              <path d="M13.3,19.7 Q9,18.5 6.5,17.9"     stroke="#F59E0B" strokeWidth="1.7" strokeLinecap="round" fill="none"/>
+              <path d="M16.8,14.6 Q13,10 10.5,5.6"      stroke="#F59E0B" strokeWidth="2.1" strokeLinecap="round" fill="none"/>
+              {/* Sun body — slightly organic, not a perfect circle */}
+              <path
+                d="M22,13.5 C26.5,13 30,17 30,22 C30,27 26.5,31 22,31 C17.5,31 14,27 14,22 C14,17 17.5,13.5 22,13.5 Z"
+                fill="url(#sg)"
+              />
             </svg>
-            <span className={`${raleway.className} text-[1.4rem] text-[#0F172A] tracking-tight`}>
+            <span className={`${raleway.className} text-[1.45rem] text-[#0F172A] tracking-tight`}>
               SolarDesk
             </span>
           </div>
