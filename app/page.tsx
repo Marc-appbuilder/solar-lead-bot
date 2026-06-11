@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import { Raleway } from 'next/font/google';
+
+const raleway = Raleway({ subsets: ['latin'], weight: ['800'] });
 
 export default function HomePage() {
   return (
@@ -7,9 +10,32 @@ export default function HomePage() {
       {/* ── Nav ── */}
       <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <span className="text-base font-black tracking-tight text-[#0F172A]">
-            ☀️ SolarDesk
-          </span>
+          <div className="flex items-center gap-2.5">
+            {/* Hand-drawn style sun icon */}
+            <svg viewBox="0 0 44 44" width="40" height="40" fill="none" aria-hidden="true">
+              <defs>
+                <radialGradient id="sunGrd" cx="38%" cy="30%" r="65%">
+                  <stop offset="0%"   stopColor="#FDE68A"/>
+                  <stop offset="45%"  stopColor="#FBBF24"/>
+                  <stop offset="100%" stopColor="#D97706"/>
+                </radialGradient>
+              </defs>
+              {/* 8 rays — slightly curved paths for a hand-drawn feel */}
+              <path d="M22,10.5 Q22.8,6.5 22,2"        stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+              <path d="M30.1,13.9 Q34,10.5 37.5,6.5"   stroke="#F59E0B" strokeWidth="2"   strokeLinecap="round" fill="none"/>
+              <path d="M33.5,22 Q37.5,22.6 42,22"      stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+              <path d="M30.1,30.1 Q34,34.5 37.5,37.5"  stroke="#F59E0B" strokeWidth="2"   strokeLinecap="round" fill="none"/>
+              <path d="M22,33.5 Q21.2,37.8 22,42"      stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+              <path d="M13.9,30.1 Q10,34.5 6.5,37.5"   stroke="#F59E0B" strokeWidth="2"   strokeLinecap="round" fill="none"/>
+              <path d="M10.5,22 Q6.5,21.4 2,22"        stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+              <path d="M13.9,13.9 Q10,10.5 6.5,6.5"    stroke="#F59E0B" strokeWidth="2"   strokeLinecap="round" fill="none"/>
+              {/* Sun body with warm radial gradient */}
+              <circle cx="22" cy="22" r="9.5" fill="url(#sunGrd)"/>
+            </svg>
+            <span className={`${raleway.className} text-[1.4rem] text-[#0F172A] tracking-tight`}>
+              SolarDesk
+            </span>
+          </div>
           <Link
             href="/login"
             className="text-sm text-gray-400 transition hover:text-gray-600"
