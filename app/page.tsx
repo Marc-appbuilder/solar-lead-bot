@@ -1,31 +1,9 @@
 import Link from 'next/link';
-import Script from 'next/script';
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#0c0f17] text-white font-sans antialiased">
 
-      {/* Live demo widget */}
-      <Script src="/embed.js?clientId=landing-demo" strategy="afterInteractive" />
-
-      {/* Cal.com embed */}
-      <Script id="cal-inline-embed" strategy="afterInteractive">{`
-        (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
-        Cal("init", "solardesk-demo", {origin:"https://app.cal.com"});
-        Cal.ns["solardesk-demo"]("inline", {
-          elementOrSelector:"#my-cal-inline-solardesk-demo",
-          config: {"layout":"month_view","useSlotsViewOnSmallScreen":"true"},
-          calLink: "gladetech/solardesk-demo",
-        });
-        Cal.ns["solardesk-demo"]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
-      `}</Script>
-
-      {/* Try Ray live label */}
-      <div className="pointer-events-none fixed bottom-[100px] right-4 z-[2147483646] flex flex-col items-end gap-1">
-        <div className="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-semibold text-amber-400 shadow-lg backdrop-blur-sm">
-          Try Ray live
-        </div>
-      </div>
 
       {/* ── Nav ── */}
       <nav className="sticky top-0 z-50 border-b border-white/5 bg-[#0c0f17]/90 backdrop-blur-md">
@@ -237,14 +215,6 @@ export default function HomePage() {
             </a>
           </div>
 
-          <p className="mb-6 text-sm font-semibold uppercase tracking-widest text-white/25">
-            Or book 15 minutes
-          </p>
-          <div
-            id="my-cal-inline-solardesk-demo"
-            className="overflow-hidden rounded-2xl border border-white/5"
-            style={{ width: '100%', minHeight: '600px', overflow: 'scroll' }}
-          />
         </div>
       </section>
 
