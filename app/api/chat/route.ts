@@ -109,7 +109,11 @@ async function sendLeadEmail(lead: LeadPayload, clientId: string) {
     subject: `New solar lead — ${config.name}`,
     html: buildHtml(lead, config.name, config.brandColour),
   });
-  if (error) console.error('[lead] resend error:', error);
+  if (error) {
+    console.error('[lead] resend error:', JSON.stringify(error));
+  } else {
+    console.log('[lead] email sent OK');
+  }
 }
 
 /* ── Types ──────────────────────────────────────────────────────────────── */
@@ -222,7 +226,12 @@ export async function POST(req: NextRequest) {
             .select('id').eq('agent_id', clientId).eq('phone', toolInput.phone)
             .gte('created_at', cutoff).limit(1);
           if (data && data.length > 0) isDuplicate = true;
-          if (!isDuplicate) sendLeadEmail(toolInput, clientId).catch(console.error);
+          if (isDuplicate) {
+            console.log(`[lead] duplicate suppressed — clientId=${clientId} phone=${toolInput.phone}`);
+          } else {
+            console.log(`[lead] sending email to ${config.notificationEmail} for clientId=${clientId}`);
+            sendLeadEmail(toolInput, clientId).catch(console.error);
+          }
           const isGold = toolInput.owns_property === true &&
             (toolInput.monthly_bill === '£150–£250' || toolInput.monthly_bill === '£250+');
           supabase.from('leads').insert({
