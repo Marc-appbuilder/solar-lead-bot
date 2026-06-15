@@ -4,6 +4,17 @@ import { NextResponse, type NextRequest } from 'next/server';
 const ADMIN_EMAILS = ['marcwrichards@gmail.com', 'marcwrichards@me.com'];
 
 export async function middleware(request: NextRequest) {
+  // Route demo.solardesk.co.uk → /demo
+  // (widget, api, embed.js already excluded from this matcher so they work fine)
+  const hostname = request.headers.get('host') ?? '';
+  if (hostname.startsWith('demo.')) {
+    const url = request.nextUrl.clone();
+    if (!url.pathname.startsWith('/demo')) {
+      url.pathname = '/demo';
+      return NextResponse.rewrite(url);
+    }
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
