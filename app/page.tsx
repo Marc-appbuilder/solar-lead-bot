@@ -11,31 +11,48 @@ export default function HomePage() {
       <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
-            {/* Hand-crafted sun — irregular rays, warm gradient, organic circle */}
-            <svg viewBox="0 0 44 44" width="38" height="38" fill="none" aria-hidden="true">
+            {/* Solar panel + sun mark */}
+            <svg viewBox="0 0 54 50" width="46" height="42" aria-hidden="true">
               <defs>
-                <radialGradient id="sg" cx="40%" cy="35%" r="62%">
-                  <stop offset="0%"   stopColor="#FEF3C7"/>
-                  <stop offset="40%"  stopColor="#FBBF24"/>
-                  <stop offset="100%" stopColor="#D97706"/>
+                {/* Panel: light teal top-right → dark navy bottom-left */}
+                <linearGradient id="pg" gradientUnits="userSpaceOnUse" x1="43" y1="19" x2="9" y2="43">
+                  <stop offset="0%"   stopColor="#4DD0E1"/>
+                  <stop offset="40%"  stopColor="#1E88E5"/>
+                  <stop offset="100%" stopColor="#0D47A1"/>
+                </linearGradient>
+                {/* Sun: golden centre → deep orange edge */}
+                <radialGradient id="sng" cx="44%" cy="38%" r="56%">
+                  <stop offset="0%"   stopColor="#FFE082"/>
+                  <stop offset="50%"  stopColor="#FFA726"/>
+                  <stop offset="100%" stopColor="#E65100"/>
                 </radialGradient>
+                {/* Clip panel grid lines to panel shape */}
+                <clipPath id="pc">
+                  <path d="M7,27 L35,18 L45,35 L17,44 Z"/>
+                </clipPath>
               </defs>
-              {/* 10 rays at intentionally non-uniform angles & lengths */}
-              <path d="M21.7,13 Q20.8,7 21.3,1.5"      stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
-              <path d="M26.5,14.2 Q28,11 29.5,9"        stroke="#F59E0B" strokeWidth="1.7" strokeLinecap="round" fill="none"/>
-              <path d="M29.6,17.2 Q34,14 37.3,12.5"     stroke="#F59E0B" strokeWidth="2.0" strokeLinecap="round" fill="none"/>
-              <path d="M30.8,20.7 Q34.5,20 37.6,19.8"   stroke="#F59E0B" strokeWidth="1.7" strokeLinecap="round" fill="none"/>
-              <path d="M30.2,25.8 Q34,27.5 37.4,29.2"   stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
-              <path d="M25.8,30.2 Q28,35 30,39.2"       stroke="#F59E0B" strokeWidth="2.0" strokeLinecap="round" fill="none"/>
-              <path d="M19.7,30.7 Q18.5,34 18.1,36.5"   stroke="#F59E0B" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
-              <path d="M14.6,27.2 Q10.5,30 7.3,32.3"    stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
-              <path d="M13.3,19.7 Q9,18.5 6.5,17.9"     stroke="#F59E0B" strokeWidth="1.7" strokeLinecap="round" fill="none"/>
-              <path d="M16.8,14.6 Q13,10 10.5,5.6"      stroke="#F59E0B" strokeWidth="2.1" strokeLinecap="round" fill="none"/>
-              {/* Sun body — slightly organic, not a perfect circle */}
-              <path
-                d="M22,13.5 C26.5,13 30,17 30,22 C30,27 26.5,31 22,31 C17.5,31 14,27 14,22 C14,17 17.5,13.5 22,13.5 Z"
-                fill="url(#sg)"
+
+              {/* Sun: 12-pointed star, sits behind the panel */}
+              <polygon
+                points="38,2 39.9,6 43.5,3.5 43.1,7.9 47.5,7.5 45,11.1 49,13 45,14.9 47.5,18.5 43.1,18.1 43.5,22.5 39.9,20 38,24 36.1,20 32.5,22.5 32.9,18.1 28.5,18.5 31,14.9 27,13 31,11.1 28.5,7.5 32.9,7.9 32.5,3.5 36.1,6"
+                fill="url(#sng)"
               />
+
+              {/* Solar panel parallelogram */}
+              <path d="M7,27 L35,18 L45,35 L17,44 Z" fill="url(#pg)"/>
+
+              {/* Grid lines — 4 cols × 5 rows, clipped to panel */}
+              <g clipPath="url(#pc)" stroke="white" strokeWidth="0.8" opacity="0.35">
+                {/* Row dividers */}
+                <line x1="9"  y1="30.4" x2="37" y2="21.4"/>
+                <line x1="11" y1="33.8" x2="39" y2="24.8"/>
+                <line x1="13" y1="37.2" x2="41" y2="28.2"/>
+                <line x1="15" y1="40.6" x2="43" y2="31.6"/>
+                {/* Column dividers */}
+                <line x1="14" y1="24.75" x2="24" y2="41.75"/>
+                <line x1="21" y1="22.5"  x2="31" y2="39.5"/>
+                <line x1="28" y1="20.25" x2="38" y2="37.25"/>
+              </g>
             </svg>
             <span className={`${raleway.className} text-[1.45rem] text-[#0F172A] tracking-tight`}>
               SolarDesk
