@@ -11,19 +11,19 @@ export default function HomePage() {
       <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
-            {/* 16-point geometric sunburst */}
-            <svg viewBox="0 0 44 44" width="36" height="36" aria-hidden="true">
-              <defs>
-                <radialGradient id="sunG" cx="40%" cy="35%" r="65%">
-                  <stop offset="0%"   stopColor="#FDE68A"/>
-                  <stop offset="50%"  stopColor="#F59E0B"/>
-                  <stop offset="100%" stopColor="#B45309"/>
-                </radialGradient>
-              </defs>
-              <polygon
-                points="22,1 26.2,11.8 36.9,7.1 32.2,17.8 43,22 32.2,26.2 36.9,36.9 26.2,32.2 22,43 17.8,32.2 7.1,36.9 11.8,26.2 1,22 11.8,17.8 7.1,7.1 17.8,11.8"
-                fill="url(#sunG)"
-              />
+            {/* Circle + 8 rays sun */}
+            <svg viewBox="0 0 36 36" width="34" height="34" fill="none" aria-hidden="true">
+              <circle cx="18" cy="18" r="7" fill="#F59E0B"/>
+              <g stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round">
+                <line x1="18" y1="2"    x2="18" y2="7"/>
+                <line x1="18" y1="29"   x2="18" y2="34"/>
+                <line x1="2"  y1="18"   x2="7"  y2="18"/>
+                <line x1="29" y1="18"   x2="34" y2="18"/>
+                <line x1="6.5"  y1="6.5"  x2="10" y2="10"/>
+                <line x1="26"   y1="26"   x2="29.5" y2="29.5"/>
+                <line x1="29.5" y1="6.5"  x2="26"   y2="10"/>
+                <line x1="10"   y1="26"   x2="6.5"  y2="29.5"/>
+              </g>
             </svg>
             <span className={`${raleway.className} text-[1.45rem] text-[#0F172A] tracking-tight`}>
               SolarDesk
