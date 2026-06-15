@@ -11,48 +11,19 @@ export default function HomePage() {
       <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
-            {/* Solar panel + sun mark */}
-            <svg viewBox="0 0 54 50" width="46" height="42" aria-hidden="true">
+            {/* 16-point geometric sunburst */}
+            <svg viewBox="0 0 44 44" width="36" height="36" aria-hidden="true">
               <defs>
-                {/* Panel: light teal top-right → dark navy bottom-left */}
-                <linearGradient id="pg" gradientUnits="userSpaceOnUse" x1="43" y1="19" x2="9" y2="43">
-                  <stop offset="0%"   stopColor="#4DD0E1"/>
-                  <stop offset="40%"  stopColor="#1E88E5"/>
-                  <stop offset="100%" stopColor="#0D47A1"/>
-                </linearGradient>
-                {/* Sun: golden centre → deep orange edge */}
-                <radialGradient id="sng" cx="44%" cy="38%" r="56%">
-                  <stop offset="0%"   stopColor="#FFE082"/>
-                  <stop offset="50%"  stopColor="#FFA726"/>
-                  <stop offset="100%" stopColor="#E65100"/>
+                <radialGradient id="sunG" cx="40%" cy="35%" r="65%">
+                  <stop offset="0%"   stopColor="#FDE68A"/>
+                  <stop offset="50%"  stopColor="#F59E0B"/>
+                  <stop offset="100%" stopColor="#B45309"/>
                 </radialGradient>
-                {/* Clip panel grid lines to panel shape */}
-                <clipPath id="pc">
-                  <path d="M7,27 L35,18 L45,35 L17,44 Z"/>
-                </clipPath>
               </defs>
-
-              {/* Sun: 12-pointed star, sits behind the panel */}
               <polygon
-                points="38,2 39.9,6 43.5,3.5 43.1,7.9 47.5,7.5 45,11.1 49,13 45,14.9 47.5,18.5 43.1,18.1 43.5,22.5 39.9,20 38,24 36.1,20 32.5,22.5 32.9,18.1 28.5,18.5 31,14.9 27,13 31,11.1 28.5,7.5 32.9,7.9 32.5,3.5 36.1,6"
-                fill="url(#sng)"
+                points="22,1 26.2,11.8 36.9,7.1 32.2,17.8 43,22 32.2,26.2 36.9,36.9 26.2,32.2 22,43 17.8,32.2 7.1,36.9 11.8,26.2 1,22 11.8,17.8 7.1,7.1 17.8,11.8"
+                fill="url(#sunG)"
               />
-
-              {/* Solar panel parallelogram */}
-              <path d="M7,27 L35,18 L45,35 L17,44 Z" fill="url(#pg)"/>
-
-              {/* Grid lines — 4 cols × 5 rows, clipped to panel */}
-              <g clipPath="url(#pc)" stroke="white" strokeWidth="0.8" opacity="0.35">
-                {/* Row dividers */}
-                <line x1="9"  y1="30.4" x2="37" y2="21.4"/>
-                <line x1="11" y1="33.8" x2="39" y2="24.8"/>
-                <line x1="13" y1="37.2" x2="41" y2="28.2"/>
-                <line x1="15" y1="40.6" x2="43" y2="31.6"/>
-                {/* Column dividers */}
-                <line x1="14" y1="24.75" x2="24" y2="41.75"/>
-                <line x1="21" y1="22.5"  x2="31" y2="39.5"/>
-                <line x1="28" y1="20.25" x2="38" y2="37.25"/>
-              </g>
             </svg>
             <span className={`${raleway.className} text-[1.45rem] text-[#0F172A] tracking-tight`}>
               SolarDesk
