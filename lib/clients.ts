@@ -8,6 +8,8 @@ export interface ClientConfig {
   brandColour: string;
   teaserText?: string;
   widgetPosition?: string;
+  assistantDisplayName?: string;  // platform-level name shown in notifications and the widget footer — defaults to 'SolarDesk' for hand-configured clients, 'Chatacus' for Chatacus-provisioned ones
+  provisionedVia?: string;        // 'chatacus-v1' for Chatacus-provisioned clients — undefined for every hand-configured client
 }
 
 export const clients: Record<string, ClientConfig> = {

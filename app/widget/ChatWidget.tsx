@@ -623,7 +623,7 @@ export default function ChatWidget({ clientId, config }: Props) {
         </p>
         <p style={{ margin: 0, fontSize: '10px', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.01em' }}>
           Powered by{' '}
-          <span style={{ color: '#f97316', fontWeight: 700 }}>SolarDesk</span>
+          <span style={{ color: '#f97316', fontWeight: 700 }}>{config.assistantDisplayName || 'Chatacus'}</span>
         </p>
       </div>
     </div>

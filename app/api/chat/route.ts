@@ -1,6 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 import { getClient } from '@/lib/clients';
+import { resolveClient } from '@/lib/chatacus/resolveClient';
+import { sendLeadWebhook } from '@/lib/chatacus/leadWebhook';
 import { Resend } from 'resend';
 import { supabase } from '@/lib/supabase';
 import type { LeadPayload } from '@/app/api/lead/route';
@@ -34,13 +36,16 @@ function checkRateLimit(ip: string): boolean {
 const captureLeadTool: Anthropic.Tool = {
   name: 'capture_lead',
   description:
-    'Call this tool as soon as the user provides their mobile number (step 6). ' +
-    'Include all fields collected during the conversation. ' +
+    'Call this tool once you have reached the final step of your current script and the user has ' +
+    'provided their mobile number. Include all fields collected during the conversation — only some ' +
+    'scripts ask for a name and email in addition to phone/postcode/bill/photo. ' +
     'Never skip this tool because a field is missing — call it with whatever was collected.',
   input_schema: {
     type: 'object' as const,
     properties: {
-      phone:          { type: 'string', description: 'Mobile number provided in step 6' },
+      name:           { type: 'string', description: 'Full name, if your script asks for one — otherwise omit' },
+      email:          { type: 'string', description: 'Email address, if your script asks for one — otherwise omit' },
+      phone:          { type: 'string', description: 'Mobile number, always collected as the final step' },
       postcode:       { type: 'string', description: 'UK postcode provided in step 2' },
       owns_property:  { type: 'boolean', description: 'Whether they own the property (step 3)' },
       monthly_bill:   { type: 'string', enum: ['Under £100', '£100–£150', '£150–£250', '£250+'], description: 'Average monthly electricity bill (step 4)' },
@@ -58,7 +63,7 @@ function escapeHtml(str: string): string {
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): string {
+function buildHtml(lead: LeadPayload, clientName: string, brandColour: string, displayName: string): string {
   const isGold = lead.owns_property === true &&
     (lead.monthly_bill === '£150–£250' || lead.monthly_bill === '£250+');
   return `<!DOCTYPE html>
@@ -95,7 +100,7 @@ function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): 
       ${lead.roof_photo_url ? `<tr><td>Roof photo</td><td><a href="${escapeHtml(lead.roof_photo_url)}" style="color:${brandColour}">View photo</a></td></tr>` : ''}
     </table>
     ${lead.summary ? `<div class="summary"><strong>Summary:</strong>\n${escapeHtml(lead.summary)}</div>` : ''}
-    <div class="footer">Sent automatically by SolarDesk</div>
+    <div class="footer">Sent automatically by ${escapeHtml(displayName)}</div>
   </div>
 </div>
 </body></html>`;
@@ -103,11 +108,15 @@ function buildHtml(lead: LeadPayload, clientName: string, brandColour: string): 
 
 async function sendLeadEmail(lead: LeadPayload, clientId: string) {
   const config = getClient(clientId);
+  // Only ever called from the non-chatacus-v1 branch below (Chatacus
+  // clients use sendLeadWebhook instead) — always a hand-configured
+  // client, so this always uses its own identity.
+  const displayName = config.assistantDisplayName || 'SolarDesk';
   const { error } = await getResend().emails.send({
-    from: 'SolarDesk <leads@solardesk.co.uk>',
+    from: `${displayName} <leads@solardesk.co.uk>`,
     to: config.notificationEmail,
     subject: `New solar lead — ${config.name}`,
-    html: buildHtml(lead, config.name, config.brandColour),
+    html: buildHtml(lead, config.name, config.brandColour, displayName),
   });
   if (error) {
     console.error('[lead] resend error:', JSON.stringify(error));
@@ -146,22 +155,57 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'clientId and messages are required' }, { status: 400 });
   }
 
-  const config = getClient(clientId);
+  const config = await resolveClient(clientId);
 
-  // Fetch language setting from Supabase
-  let languageInstruction = '';
+  // Fetch language + status/provisioning flags from Supabase (one query, reused below)
   const { data: clientRow } = await supabase
     .from('clients')
-    .select('language')
+    .select('language, status, provisioned_via')
     .eq('agent_id', clientId)
     .maybeSingle();
+
+  // Only a Chatacus-provisioned client can be deactivated this way — a
+  // hand-configured client (or the existing inert 'solar-demo' DB row)
+  // has provisioned_via = null and is unaffected regardless of status.
+  if (clientRow?.provisioned_via === 'chatacus-v1' && clientRow?.status === 'inactive') {
+    const encoder = new TextEncoder();
+    const inactiveStream = new ReadableStream({
+      start(controller) {
+        const text = 'This assistant is currently unavailable. Please check back later.';
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+        controller.close();
+      },
+    });
+    return new Response(inactiveStream, {
+      headers: {
+        'Content-Type':      'text/event-stream',
+        'Cache-Control':     'no-cache, no-transform',
+        'Connection':        'keep-alive',
+        'X-Accel-Buffering': 'no',
+      },
+    });
+  }
+
+  let languageInstruction = '';
   const language = clientRow?.language ?? 'english';
   if (language === 'welsh') {
     languageInstruction = '\n\nAlways respond in Welsh (Cymraeg) only regardless of what language the user writes in.';
   } else if (language === 'bilingual') {
     languageInstruction = '\n\nYou support English and Welsh languages only. Detect whether the user is writing in English or Welsh and respond in the same language. If unsure, default to English.';
   }
-  const systemPrompt = config.systemPrompt + languageInstruction;
+  // Unlike Vaughan/Bloom, self-identification here is already baked into
+  // each hand-configured client's own scripted prompt ("You are Ray...").
+  // Rather than append a redundant brand rule to prompts that already
+  // work correctly, this is ONLY added for Chatacus-provisioned clients —
+  // whose generated prompt (lib/chatacus/promptTemplate.ts) deliberately
+  // has no self-identification of its own. Hand-configured clients get an
+  // empty string here — zero change to their existing behaviour.
+  const displayName = config.assistantDisplayName || 'Chatacus';
+  const brandRule = config.provisionedVia === 'chatacus-v1'
+    ? `\n\nBrand rule: you are ${displayName} — always introduce yourself as just "${displayName}", never as "${displayName} from [company name]". The company and ${displayName} are separate. If asked who you are, say "I'm ${displayName}" only.`
+    : '';
+  const systemPrompt = config.systemPrompt + brandRule + languageInstruction;
 
   const sanitisedMessages: Anthropic.MessageParam[] = messages
     .filter((m) => m.role === 'user' || m.role === 'assistant')
@@ -228,6 +272,10 @@ export async function POST(req: NextRequest) {
           if (data && data.length > 0) isDuplicate = true;
           if (isDuplicate) {
             console.log(`[lead] duplicate suppressed — clientId=${clientId} phone=${toolInput.phone}`);
+          } else if (config.provisionedVia === 'chatacus-v1') {
+            // Chatacus-provisioned client: notify Chatacus's own system
+            // instead of SolarDesk's Resend. Never both.
+            sendLeadWebhook(toolInput, clientId).catch(console.error);
           } else {
             console.log(`[lead] sending email to ${config.notificationEmail} for clientId=${clientId}`);
             sendLeadEmail(toolInput, clientId).catch(console.error);
