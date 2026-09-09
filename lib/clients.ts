@@ -8,6 +8,8 @@ export interface ClientConfig {
   brandColour: string;
   teaserText?: string;
   widgetPosition?: string;
+  widgetOffsetX?: number;  // px, layered on top of widgetPosition; +x = right, 0 = no change
+  widgetOffsetY?: number;  // px, layered on top of widgetPosition; +y = down, 0 = no change
   assistantDisplayName?: string;  // platform-level name shown in notifications and the widget footer — defaults to 'SolarDesk' for hand-configured clients, 'Chatacus' for Chatacus-provisioned ones
   provisionedVia?: string;        // 'chatacus-v1' for Chatacus-provisioned clients — undefined for every hand-configured client
 }
